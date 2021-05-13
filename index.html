@@ -1,0 +1,24 @@
+<html>
+  <body>
+    <script>
+      function sendConfig () {
+        const mode = document.getElementById('config').value;
+        fetch('/config', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({mode})
+        })
+      }
+
+      function getBooks() {
+        fetch('/books').then(res => res.text()).then(body => console.log('Body', body))
+      }
+
+    </script>
+    <input name="mode" type="text" id="config" />
+    <button onclick="sendConfig()">Config</button>
+    <button onclick="getBooks()">Get Books</button>
+  </body>
+</html>
