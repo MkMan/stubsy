@@ -9,8 +9,16 @@ stubsy.registerEndpoint('books', {
   responseBody: [{ title: 'Divine reality' }, { title: 'The sealed nectar' }],
 });
 
-stubsy.registerOverride('books', 'error', { status: 404, responseBody: {} });
-stubsy.registerOverride('books', 'outage', { status: 500, responseBody: {} });
+stubsy.registerOverride('books', 'error', {
+  status: 404,
+  responseBody: { message: 'resource not found' },
+});
+stubsy.registerOverride('books', 'outage', {
+  status: 500,
+  responseBody: { message: 'server outage' },
+});
+
+stubsy.activateOverride('books', 'error');
 
 stubsy.registerEndpoint('magazines', {
   path: '/magazines',

@@ -105,6 +105,13 @@ export class Stubsy {
     overridesForEndpoint.set(overrideId, overrideBehaviour);
   }
 
+  public activateOverride(
+    endpointId: EndpointId,
+    overrideId: OverrideId = 'none'
+  ): void {
+    this.activeOverrides.set(endpointId, overrideId);
+  }
+
   private initialiseMiddleWare(): void {
     this.app.use(json());
   }
@@ -115,9 +122,9 @@ export class Stubsy {
 
   private initialiseConfigRoute(): void {
     this.app.post('/Stubsy/Config', (req, res, next) => {
-      const { endpointId, overrideId = 'none' }: ConfigPayload = req.body;
+      const { endpointId, overrideId }: ConfigPayload = req.body;
 
-      this.activeOverrides.set(endpointId, overrideId);
+      this.activateOverride(endpointId, overrideId);
       res.send({ status: 'OK' });
     });
 
