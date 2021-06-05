@@ -77,6 +77,15 @@ an override for
 * `overrideId` \<String\> **required**: a unique identifier for the override
 * `overrideBehaviour` \<OverrideBehaviour\> **required**: the override's behaviour
 
+#### `stubsy.activateOverride(endpointId, overrideId)`
+
+Activates the specified override on the endpoint.
+
+* `endpointId` \<String\> **required**: the id of the endpoint to activate
+the override on
+* `overrideId` \<String\>: the id of the override to activate. If omitted
+restores the override to the default behaviour.
+
 #### `stubsy.start()`
 
 Starts the server on the port number specified.
@@ -100,6 +109,7 @@ stubsy.registerEndpoint('films', {
 stubsy.registerOverride('films', 'error', { status: 404, responseBody: {} });
 stubsy.registerOverride('films', 'outage', { status: 500, responseBody: {} });
 
+stubsy.activateOverride('films', 'outage');
 
 stubsy.start();
 ```
