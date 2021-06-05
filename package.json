@@ -53,6 +53,8 @@
     "eslint-plugin-react-hooks": "^4.2.0",
     "husky": "^6.0.0",
     "lint-staged": "^11.0.0",
+    "markdownlint": "^0.23.1",
+    "markdownlint-cli": "^0.27.1",
     "nodemon": "^2.0.7",
     "parcel-bundler": "^1.12.5",
     "prettier": "2.3.0",
@@ -64,6 +66,7 @@
   },
   "lint-staged": {
     "*.{js,ts,tsx}": "eslint --fix",
-    "*.{js,ts,tsx,scss,json,html}": "prettier --write"
+    "*.{js,ts,tsx,scss,json,html}": "prettier --write",
+    "*.md": "markdownlint --fix"
   }
 }
