@@ -1,5 +1,11 @@
 # Stubsy
 
+* [Installation](#installation)
+* [Usage](#usage)
+  * [Definitions](#definitions)
+  * [API](#api)
+  * [Example](#example)
+
 Stubsy is a Node server built using Express. Its main goal is to allow
 developers to easily set up the server but more importantly change its
 behaviour after launch. This can be useful to test how the UI behaves
@@ -7,6 +13,8 @@ when an endpoint's response is `404` instead `200` for example.
 
 Stubsy ships with a UI to show the set up of the server and allow
 changing endpoint's behaviour.
+
+![animated demo of Stubsy](./docs/stubsy.gif)
 
 ## Installation
 
