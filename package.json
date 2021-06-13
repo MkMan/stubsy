@@ -15,7 +15,9 @@
     "build": "npm run build-server && npm run build-ui",
     "format": "prettier --write ./**/*.{ts,tsx,scss,html} && eslint --fix . --ext .ts,.tsx",
     "prepare": "husky install",
-    "start": "npm run build-server && concurrently -k 'npm run build-server:watch' 'npm run build-ui:watch' 'nodemon --exec \"ts-node\" ./demo.ts'"
+    "start": "npm run build-server && concurrently -k 'npm run build-server:watch' 'npm run build-ui:watch' 'nodemon --exec \"ts-node\" ./demo.ts'",
+    "test:watch": "jest --watch",
+    "test": "jest"
   },
   "keywords": [
     "mock",
