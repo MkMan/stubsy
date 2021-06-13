@@ -10,8 +10,8 @@
   "scripts": {
     "build-server:watch": "tsc -p ./tsconfig-server.json -w --preserveWatchOutput",
     "build-server": "tsc -p ./tsconfig-server.json",
-    "build-ui:watch": "parcel watch --public-url /Stubsy/ --out-dir dist/ui ui/index.html",
-    "build-ui": "parcel build --public-url /Stubsy/ --out-dir dist/ui ui/index.html",
+    "build-ui:watch": "parcel watch --public-url /Stubsy/ --out-dir dist/ui src/ui/index.html",
+    "build-ui": "parcel build --public-url /Stubsy/ --out-dir dist/ui src/ui/index.html",
     "build": "npm run build-server && npm run build-ui",
     "format": "prettier --write ./**/*.{ts,tsx,scss,html} && eslint --fix . --ext .ts,.tsx",
     "prepare": "husky install",
