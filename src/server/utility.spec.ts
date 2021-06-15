@@ -1,4 +1,4 @@
-import { generateUiConfigResponse } from './utility';
+import { assert, generateUiConfigResponse } from './utility';
 import type {
   StubsyEndpoints,
   StubsyOverrides,
@@ -8,6 +8,22 @@ import type {
 } from './types';
 
 describe(`Stubsy Utility functions`, () => {
+  describe(`assert`, () => {
+    const errorMessage = 'quick mafs';
+
+    it(`should throw an error if the condition is not met`, () => {
+      expect(() => {
+        assert(2 + 2 != 4, errorMessage);
+      }).toThrow(errorMessage);
+    });
+
+    it(`should not throw an error if the condition is met`, () => {
+      expect(() => {
+        assert(2 + 2 === 4, errorMessage);
+      }).not.toThrow();
+    });
+  });
+
   describe(`generateUiConfigResponse`, () => {
     const emptyMap = new Map();
 

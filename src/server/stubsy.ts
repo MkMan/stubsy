@@ -3,7 +3,7 @@ import { json } from 'body-parser';
 import http from 'http';
 import path from 'path';
 
-import { generateUiConfigResponse } from './utility';
+import { assert, generateUiConfigResponse } from './utility';
 import type {
   ConfigPayload,
   ConfigResponseEntry,
@@ -43,10 +43,11 @@ export class Stubsy {
     endpointId: EndpointId,
     endpointBehaviour: EndpointBehaviour
   ): void {
-    if (this.endpoints.has(endpointId)) {
-      console.error(`Endpoint with id ${endpointId} has already been defined`);
-      return;
-    }
+    assert(
+      !this.endpoints.has(endpointId),
+      `Endpoint with id ${endpointId} has already been defined`
+    );
+
     this.endpoints.set(endpointId, endpointBehaviour);
 
     const {
@@ -86,19 +87,17 @@ export class Stubsy {
     overrideId: OverrideId,
     overrideBehaviour: OverrideBehaviour
   ): void {
-    if (!this.endpoints.has(endpointId)) {
-      console.error(`Endpoint with id${endpointId} has not been defined`);
-      return;
-    }
+    assert(
+      this.endpoints.has(endpointId),
+      `Endpoint with id${endpointId} has not been defined`
+    );
 
     const overridesForEndpoint = this.overrides.get(endpointId);
 
-    if (overridesForEndpoint?.has(overrideId)) {
-      console.error(
-        `An override with id ${overrideId} has already been set for endpoint ${endpointId}`
-      );
-      return;
-    }
+    assert(
+      !overridesForEndpoint?.has(overrideId),
+      `An override with id ${overrideId} has already been set for endpoint ${endpointId}`
+    );
 
     if (!overridesForEndpoint) {
       this.overrides.set(
