@@ -26,3 +26,10 @@ export type ConfigResponseEntry = {
   type: EndpointBehaviour['type'];
   overrides: { overrideId: OverrideId; isActive: boolean }[];
 };
+
+export type StubsyEndpoints = Map<EndpointId, EndpointBehaviour>;
+export type StubsyOverrides = Map<
+  EndpointId,
+  Map<OverrideId, OverrideBehaviour>
+>;
+export type StubsyActiveOverrides = Map<EndpointId, OverrideId>;

@@ -1,0 +1,38 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Stubsy Utility functions generateUiConfigResponse should return a correctly structured response for the UI 1`] = `
+Array [
+  Object {
+    "endpointId": "movies",
+    "overrides": Array [
+      Object {
+        "isActive": true,
+        "overrideId": "movies-404",
+      },
+      Object {
+        "isActive": false,
+        "overrideId": "movies-500",
+      },
+    ],
+    "path": "/movies",
+    "type": "get",
+  },
+  Object {
+    "endpointId": "books",
+    "overrides": Array [],
+    "path": "/books",
+    "type": "post",
+  },
+  Object {
+    "endpointId": "shows",
+    "overrides": Array [
+      Object {
+        "isActive": false,
+        "overrideId": "shows-200",
+      },
+    ],
+    "path": "/shows",
+    "type": "delete",
+  },
+]
+`;

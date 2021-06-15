@@ -3,6 +3,7 @@ import { json } from 'body-parser';
 import http from 'http';
 import path from 'path';
 
+import { generateUiConfigResponse } from './utility';
 import type {
   ConfigPayload,
   ConfigResponseEntry,
@@ -10,18 +11,19 @@ import type {
   EndpointId,
   OverrideBehaviour,
   OverrideId,
+  StubsyActiveOverrides,
+  StubsyEndpoints,
+  StubsyOverrides,
 } from './types';
 
 export class Stubsy {
   private app: Express;
-  private portNumber: number;
 
-  private endpoints: Map<EndpointId, EndpointBehaviour> = new Map();
-  private overrides: Map<EndpointId, Map<OverrideId, OverrideBehaviour>> =
-    new Map();
-  private activeOverrides: Map<EndpointId, OverrideId> = new Map();
+  private endpoints: StubsyEndpoints = new Map();
+  private overrides: StubsyOverrides = new Map();
+  private activeOverrides: StubsyActiveOverrides = new Map();
 
-  constructor(portNumber: number) {
+  constructor(private portNumber: number) {
     this.app = express();
     this.portNumber = portNumber;
 
@@ -31,9 +33,8 @@ export class Stubsy {
   }
 
   public start(): http.Server {
-    console.log(`Stubsy is now listening on port ${this.portNumber}`);
     console.log(
-      `The Stubsy UI can be accessed on http://localhost:${this.portNumber}/Stubsy`
+      `Stubsy is now listening on port ${this.portNumber}\nThe Stubsy UI can be accessed on http://localhost:${this.portNumber}/Stubsy`
     );
     return this.app.listen(this.portNumber);
   }
@@ -59,7 +60,8 @@ export class Stubsy {
       const activeOverrideId = this.activeOverrides.get(endpointId);
 
       if (activeOverrideId === 'none' || !activeOverrideId) {
-        res.status(defaultStatus).send(defaultResponseBody);
+        res.status(defaultStatus);
+        res.send(defaultResponseBody);
         return;
       }
 
@@ -67,11 +69,15 @@ export class Stubsy {
         .get(endpointId)
         ?.get(activeOverrideId);
 
-      if (activeOverrideBehaviour) {
-        const { status, responseBody } = activeOverrideBehaviour;
-        res.status(status).send(responseBody);
+      if (!activeOverrideBehaviour) {
+        res.status(500);
+        res.send({ error: 'Override has no defined behaviour' });
         return;
       }
+
+      const { status, responseBody } = activeOverrideBehaviour;
+      res.status(status);
+      res.send(responseBody);
     });
   }
 
@@ -129,25 +135,11 @@ export class Stubsy {
     });
 
     this.app.get('/Stubsy/Config', (req, res, next) => {
-      const response: ConfigResponseEntry[] = [];
-
-      this.endpoints.forEach(({ path, type }, endpointId) => {
-        const overridesForEndpoint = this.overrides.get(endpointId);
-
-        if (!overridesForEndpoint) {
-          response.push({ endpointId, path, type, overrides: [] });
-          return;
-        }
-
-        const overrides: ConfigResponseEntry['overrides'] = [];
-        overridesForEndpoint.forEach((_overrideBehaviour, overrideId) => {
-          overrides.push({
-            overrideId,
-            isActive: this.activeOverrides.get(endpointId) === overrideId,
-          });
-        });
-        response.push({ endpointId, path, type, overrides });
-      });
+      const response: ConfigResponseEntry[] = generateUiConfigResponse(
+        this.endpoints,
+        this.overrides,
+        this.activeOverrides
+      );
 
       res.send(response);
     });

@@ -10,12 +10,14 @@
   "scripts": {
     "build-server:watch": "tsc -p ./tsconfig-server.json -w --preserveWatchOutput",
     "build-server": "tsc -p ./tsconfig-server.json",
-    "build-ui:watch": "parcel watch --public-url /Stubsy/ --out-dir dist/ui ui/index.html",
-    "build-ui": "parcel build --public-url /Stubsy/ --out-dir dist/ui ui/index.html",
+    "build-ui:watch": "parcel watch --public-url /Stubsy/ --out-dir dist/ui src/ui/index.html",
+    "build-ui": "parcel build --public-url /Stubsy/ --out-dir dist/ui src/ui/index.html",
     "build": "npm run build-server && npm run build-ui",
     "format": "prettier --write ./**/*.{ts,tsx,scss,html} && eslint --fix . --ext .ts,.tsx",
     "prepare": "husky install",
-    "start": "npm run build-server && concurrently -k 'npm run build-server:watch' 'npm run build-ui:watch' 'nodemon --exec \"ts-node\" ./demo.ts'"
+    "start": "npm run build-server && concurrently -k 'npm run build-server:watch' 'npm run build-ui:watch' 'nodemon --exec \"ts-node\" ./demo.ts'",
+    "test:watch": "jest --watch",
+    "test": "jest"
   },
   "keywords": [
     "mock",
@@ -43,6 +45,7 @@
     "@types/body-parser": "^1.19.0",
     "@types/cors": "^2.8.10",
     "@types/express": "^4.17.11",
+    "@types/jest": "^26.0.23",
     "@types/react": "^17.0.5",
     "@types/react-dom": "^17.0.5",
     "@typescript-eslint/eslint-plugin": "^4.23.0",
@@ -52,6 +55,7 @@
     "eslint-plugin-react": "^7.23.2",
     "eslint-plugin-react-hooks": "^4.2.0",
     "husky": "^6.0.0",
+    "jest": "^27.0.4",
     "lint-staged": "^11.0.0",
     "markdownlint": "^0.23.1",
     "markdownlint-cli": "^0.27.1",
@@ -61,8 +65,9 @@
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "semantic-release": "^17.4.3",
+    "ts-jest": "^27.0.2",
     "ts-node": "^9.1.1",
-    "typescript": "^4.2.4"
+    "typescript": "^4.3.2"
   },
   "lint-staged": {
     "*.{js,ts,tsx}": "eslint --fix",
