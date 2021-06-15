@@ -93,17 +93,17 @@ export class Stubsy {
 
     const overridesForEndpoint = this.overrides.get(endpointId);
 
-    if (!overridesForEndpoint) {
-      this.overrides.set(
-        endpointId,
-        new Map().set(overrideId, overrideBehaviour)
+    if (overridesForEndpoint?.has(overrideId)) {
+      console.error(
+        `An override with id ${overrideId} has already been set for endpoint ${endpointId}`
       );
       return;
     }
 
-    if (overridesForEndpoint.has(overrideId)) {
-      console.error(
-        `An override with id ${overrideId} has already been set for endpoint ${endpointId}`
+    if (!overridesForEndpoint) {
+      this.overrides.set(
+        endpointId,
+        new Map().set(overrideId, overrideBehaviour)
       );
       return;
     }
