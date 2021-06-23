@@ -1,3 +1,16 @@
+# [1.2.0](https://github.com/MkMan/stubsy/compare/v1.1.0...v1.2.0) (2021-06-23)
+
+
+### Bug Fixes
+
+* correct types for status and REST call type ([dbdecf4](https://github.com/MkMan/stubsy/commit/dbdecf4341b69ff4a20e018aecc9316ce7126afc))
+
+
+### Features
+
+* expose Express app ([4421846](https://github.com/MkMan/stubsy/commit/44218469bff665542b1d2c821ef10e92b104a624))
+* throw on errors ([159d9b0](https://github.com/MkMan/stubsy/commit/159d9b0dd08a9011bee614d32e4e5136f0be68e4))
+
 # [1.1.0](https://github.com/MkMan/stubsy/compare/v1.0.0...v1.1.0) (2021-06-05)
 
 
