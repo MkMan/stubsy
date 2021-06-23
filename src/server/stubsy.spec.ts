@@ -14,6 +14,7 @@ describe(`Stubsy`, () => {
   let generateUiConfigResponseSpy: jest.SpyInstance;
   let consoleLogSpy: jest.SpyInstance;
   let assertSpy: jest.SpyInstance;
+  let generateEndpointCallbackSpy: jest.SpyInstance;
   const responseMock = {
     send: jest.fn(),
     status: jest.fn(),
@@ -29,11 +30,16 @@ describe(`Stubsy`, () => {
     );
     consoleLogSpy = jest.spyOn(console, 'log');
     assertSpy = jest.spyOn(stubsyUtilities, 'assert');
+    generateEndpointCallbackSpy = jest.spyOn(
+      stubsyUtilities,
+      'generateEndpointCallback'
+    );
   });
 
   afterEach(() => {
     consoleLogSpy.mockRestore();
     assertSpy.mockRestore();
+    generateEndpointCallbackSpy.mockRestore();
   });
 
   describe(`constructor`, () => {
@@ -159,74 +165,14 @@ describe(`Stubsy`, () => {
     });
 
     it(`should create an Express endpoint matching the specified behaviour`, () => {
+      const endpointCallback = () => 'wazah';
+      generateEndpointCallbackSpy.mockImplementation(() => endpointCallback);
+
       stubsyInstance.registerEndpoint(endpointId, endpointBehaviour);
 
       expect(stubsyInstance.app[endpointBehaviour.type]).toHaveBeenCalledWith(
         endpointBehaviour.path,
-        expect.any(Function)
-      );
-    });
-
-    it(`should return the default endpoint behaviour if it has not got an active override`, () => {
-      stubsyInstance.registerEndpoint(endpointId, endpointBehaviour);
-
-      const endpointCallback = (
-        stubsyInstance.app[endpointBehaviour.type] as jest.Mock
-      ).mock.calls.slice(-1)[0][1]; // second argument of the last call
-
-      endpointCallback(undefined, responseMock);
-
-      expect(responseMock.status).toHaveBeenCalledWith(
-        endpointBehaviour.status
-      );
-      expect(responseMock.send).toHaveBeenCalledWith(
-        endpointBehaviour.responseBody
-      );
-    });
-
-    it(`should return an error response if the overrideId has no set behaviour`, () => {
-      const overrideId = 'overrideId';
-
-      stubsyInstance.activeOverrides.set(endpointId, overrideId);
-
-      stubsyInstance.registerEndpoint(endpointId, endpointBehaviour);
-      const endpointCallback = (
-        stubsyInstance.app[endpointBehaviour.type] as jest.Mock
-      ).mock.calls.slice(-1)[0][1]; // second argument of the last call
-
-      endpointCallback(undefined, responseMock);
-
-      expect(responseMock.status).toHaveBeenCalledWith(500);
-      expect(responseMock.send).toHaveBeenCalledWith({
-        error: 'Override has no defined behaviour',
-      });
-    });
-
-    it(`should return the override behaviour if it is set`, () => {
-      const overrideId = 'overrideId';
-      const overrideBehaviour: OverrideBehaviour = {
-        status: 404,
-        responseBody: { message: 'resource not found' },
-      };
-
-      stubsyInstance.activeOverrides.set(endpointId, overrideId);
-      stubsyInstance.overrides.set(
-        endpointId,
-        new Map().set(overrideId, overrideBehaviour)
-      );
-
-      stubsyInstance.registerEndpoint(endpointId, endpointBehaviour);
-      const endpointCallback = (
-        stubsyInstance.app[endpointBehaviour.type] as jest.Mock
-      ).mock.calls.slice(-1)[0][1]; // second argument of the last call
-
-      endpointCallback(undefined, responseMock);
-
-      expect(responseMock.status).toHaveBeenCalledWith(
-        overrideBehaviour.status
-      );
-      expect(responseMock.send).toHaveBeenCalledWith(
-        overrideBehaviour.responseBody
+        endpointCallback
       );
     });
   });

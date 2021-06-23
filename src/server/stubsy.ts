@@ -3,7 +3,11 @@ import { json } from 'body-parser';
 import http from 'http';
 import path from 'path';
 
-import { assert, generateUiConfigResponse } from './utility';
+import {
+  assert,
+  generateEndpointCallback,
+  generateUiConfigResponse,
+} from './utility';
 import type {
   ConfigPayload,
   ConfigResponseEntry,
@@ -50,36 +54,18 @@ export class Stubsy {
 
     this.endpoints.set(endpointId, endpointBehaviour);
 
-    const {
-      type,
+    const { type, path } = endpointBehaviour;
+
+    this.app[type](
       path,
-      status: defaultStatus,
-      responseBody: defaultResponseBody,
-    } = endpointBehaviour;
-
-    this.app[type](path, (req, res, next) => {
-      const activeOverrideId = this.activeOverrides.get(endpointId);
-
-      if (activeOverrideId === 'none' || !activeOverrideId) {
-        res.status(defaultStatus);
-        res.send(defaultResponseBody);
-        return;
-      }
-
-      const activeOverrideBehaviour = this.overrides
-        .get(endpointId)
-        ?.get(activeOverrideId);
-
-      if (!activeOverrideBehaviour) {
-        res.status(500);
-        res.send({ error: 'Override has no defined behaviour' });
-        return;
-      }
-
-      const { status, responseBody } = activeOverrideBehaviour;
-      res.status(status);
-      res.send(responseBody);
-    });
+      generateEndpointCallback({
+        defaultStatus: endpointBehaviour.status,
+        defaultResponseBody: endpointBehaviour.responseBody,
+        activeOverrides: this.activeOverrides,
+        overrides: this.overrides,
+        endpointId,
+      })
+    );
   }
 
   public registerOverride(

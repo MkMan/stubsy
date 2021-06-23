@@ -1,4 +1,8 @@
-import { assert, generateUiConfigResponse } from './utility';
+import {
+  assert,
+  generateUiConfigResponse,
+  generateEndpointCallback,
+} from './utility';
 import type {
   StubsyEndpoints,
   StubsyOverrides,
@@ -8,6 +12,10 @@ import type {
 } from './types';
 
 describe(`Stubsy Utility functions`, () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   describe(`assert`, () => {
     const errorMessage = 'quick mafs';
 
@@ -94,6 +102,87 @@ describe(`Stubsy Utility functions`, () => {
       expect(
         generateUiConfigResponse(endpoints, overrides, activeOverrides)
       ).toMatchSnapshot();
+    });
+  });
+
+  describe(`generateEndpointCallback`, () => {
+    const responseMock = {
+      send: jest.fn(),
+      status: jest.fn(),
+    };
+    const defaultStatus: EndpointBehaviour['status'] = 200;
+    const defaultResponseBody: EndpointBehaviour['responseBody'] = [
+      'book 1',
+      'book 2',
+    ];
+    const endpointId = 'books';
+    const activeOverrides: StubsyActiveOverrides = new Map<string, string>();
+    const overrides: StubsyOverrides = new Map();
+
+    beforeEach(() => {
+      overrides.clear();
+      activeOverrides.clear();
+    });
+
+    it(`should return the default endpoint behaviour if it has not got an active override`, () => {
+      const endpointCallback = generateEndpointCallback({
+        defaultStatus,
+        defaultResponseBody,
+        activeOverrides,
+        overrides,
+        endpointId,
+      }) as any;
+
+      endpointCallback(undefined, responseMock, undefined);
+
+      expect(responseMock.status).toHaveBeenCalledWith(defaultStatus);
+      expect(responseMock.send).toHaveBeenCalledWith(defaultResponseBody);
+    });
+
+    it(`should return an error response if the overrideId has no set behaviour`, () => {
+      const overrideId = 'books-400';
+      activeOverrides.set(endpointId, overrideId);
+      const endpointCallback = generateEndpointCallback({
+        defaultStatus,
+        defaultResponseBody,
+        activeOverrides,
+        overrides,
+        endpointId,
+      }) as any;
+
+      endpointCallback(undefined, responseMock, undefined);
+
+      expect(responseMock.status).toHaveBeenCalledWith(500);
+      expect(responseMock.send).toHaveBeenCalledWith({
+        error: 'Override has no defined behaviour',
+      });
+    });
+
+    it(`should return the override behaviour if it is set`, () => {
+      const overrideId = 'overrideId';
+      const overrideBehaviour: OverrideBehaviour = {
+        status: 404,
+        responseBody: { message: 'resource not found' },
+      };
+      activeOverrides.set(endpointId, overrideId);
+      overrides.set(endpointId, new Map().set(overrideId, overrideBehaviour));
+
+      const endpointCallback = generateEndpointCallback({
+        defaultStatus,
+        defaultResponseBody,
+        activeOverrides,
+        overrides,
+        endpointId,
+      }) as any;
+
+      endpointCallback(undefined, responseMock, undefined);
+
+      expect(responseMock.status).toHaveBeenCalledWith(
+        overrideBehaviour.status
+      );
+      expect(responseMock.send).toHaveBeenCalledWith(
+        overrideBehaviour.responseBody
+      );
     });
   });
 });
