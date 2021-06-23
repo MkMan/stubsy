@@ -5,8 +5,8 @@ export type OverrideId = string;
 export type EndpointBehaviour = {
   path: string;
   responseBody: unknown;
-  status: 200 | 404 | 500;
-  type: 'get' | 'post' | 'put' | 'delete';
+  status: number;
+  type: 'get' | 'post' | 'put' | 'delete' | 'patch';
 };
 
 export type OverrideBehaviour = Pick<

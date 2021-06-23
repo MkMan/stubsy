@@ -1,6 +1,6 @@
 import { Stubsy } from './dist';
 
-const stubsy = new Stubsy(3000);
+const stubsy = new Stubsy();
 
 stubsy.registerEndpoint('books', {
   path: '/books',
@@ -27,4 +27,6 @@ stubsy.registerEndpoint('magazines', {
   responseBody: [{ title: 'Divine reality' }, { title: 'The sealed nectar' }],
 });
 
-stubsy.start();
+stubsy.app.listen(3000, () => {
+  console.log('The Stubsy UI can be accessed on http://localhost:3000/Stubsy');
+});

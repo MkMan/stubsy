@@ -13,7 +13,8 @@ describe(`Stubsy`, () => {
 
   let generateUiConfigResponseSpy: jest.SpyInstance;
   let consoleLogSpy: jest.SpyInstance;
-  let consoleErrorSpy: jest.SpyInstance;
+  let assertSpy: jest.SpyInstance;
+  let generateEndpointCallbackSpy: jest.SpyInstance;
   const responseMock = {
     send: jest.fn(),
     status: jest.fn(),
@@ -28,12 +29,17 @@ describe(`Stubsy`, () => {
       'generateUiConfigResponse'
     );
     consoleLogSpy = jest.spyOn(console, 'log');
-    consoleErrorSpy = jest.spyOn(console, 'error');
+    assertSpy = jest.spyOn(stubsyUtilities, 'assert');
+    generateEndpointCallbackSpy = jest.spyOn(
+      stubsyUtilities,
+      'generateEndpointCallback'
+    );
   });
 
   afterEach(() => {
     consoleLogSpy.mockRestore();
-    consoleErrorSpy.mockRestore();
+    assertSpy.mockRestore();
+    generateEndpointCallbackSpy.mockRestore();
   });
 
   describe(`constructor`, () => {
@@ -127,6 +133,14 @@ describe(`Stubsy`, () => {
         stubsyInstance.portNumber
       );
     });
+
+    it(`should throw an error if the portNumber is not defined when creating Stubsy`, () => {
+      const badStubsy = new Stubsy();
+
+      expect(() => {
+        badStubsy.start();
+      }).toThrow('portNumber not specified in the constructor');
+    });
   });
 
   describe(`registerEndpoint`, () => {
@@ -139,115 +153,53 @@ describe(`Stubsy`, () => {
     };
 
     beforeEach(() => {
-      consoleErrorSpy.mockImplementation(() => undefined);
       stubsyInstance = new Stubsy(portNumber);
     });
 
-    it(`should log an error if the endpointId already exists`, () => {
+    it(`should throw an error if the endpointId already exists`, () => {
       stubsyInstance.endpoints.set(endpointId, endpointBehaviour);
 
-      stubsyInstance.registerEndpoint(endpointId, endpointBehaviour);
-
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        `Endpoint with id ${endpointId} has already been defined`
-      );
+      expect(() => {
+        stubsyInstance.registerEndpoint(endpointId, endpointBehaviour);
+      }).toThrow(`Endpoint with id ${endpointId} has already been defined`);
     });
 
     it(`should add the endpoint to the instance if the endpointId is not defined`, () => {
       stubsyInstance.registerEndpoint(endpointId, endpointBehaviour);
 
-      expect(consoleErrorSpy).not.toHaveBeenCalled();
       expect(stubsyInstance.endpoints.get(endpointId)).toEqual(
         endpointBehaviour
       );
     });
 
     it(`should create an Express endpoint matching the specified behaviour`, () => {
+      const endpointCallback = () => 'wazah';
+      generateEndpointCallbackSpy.mockImplementation(() => endpointCallback);
+
       stubsyInstance.registerEndpoint(endpointId, endpointBehaviour);
 
       expect(stubsyInstance.app[endpointBehaviour.type]).toHaveBeenCalledWith(
         endpointBehaviour.path,
-        expect.any(Function)
-      );
-    });
-
-    it(`should return the default endpoint behaviour if it has not got an active override`, () => {
-      stubsyInstance.registerEndpoint(endpointId, endpointBehaviour);
-
-      const endpointCallback = (
-        stubsyInstance.app[endpointBehaviour.type] as jest.Mock
-      ).mock.calls.slice(-1)[0][1]; // second argument of the last call
-
-      endpointCallback(undefined, responseMock);
-
-      expect(responseMock.status).toHaveBeenCalledWith(
-        endpointBehaviour.status
-      );
-      expect(responseMock.send).toHaveBeenCalledWith(
-        endpointBehaviour.responseBody
-      );
-    });
-
-    it(`should return an error response if the overrideId has no set behaviour`, () => {
-      const overrideId = 'overrideId';
-
-      stubsyInstance.activeOverrides.set(endpointId, overrideId);
-
-      stubsyInstance.registerEndpoint(endpointId, endpointBehaviour);
-      const endpointCallback = (
-        stubsyInstance.app[endpointBehaviour.type] as jest.Mock
-      ).mock.calls.slice(-1)[0][1]; // second argument of the last call
-
-      endpointCallback(undefined, responseMock);
-
-      expect(responseMock.status).toHaveBeenCalledWith(500);
-      expect(responseMock.send).toHaveBeenCalledWith({
-        error: 'Override has no defined behaviour',
-      });
-    });
-
-    it(`should return the override behaviour if it is set`, () => {
-      const overrideId = 'overrideId';
-      const overrideBehaviour: OverrideBehaviour = {
-        status: 404,
-        responseBody: { message: 'resource not found' },
-      };
-
-      stubsyInstance.activeOverrides.set(endpointId, overrideId);
-      stubsyInstance.overrides.set(
-        endpointId,
-        new Map().set(overrideId, overrideBehaviour)
-      );
-
-      stubsyInstance.registerEndpoint(endpointId, endpointBehaviour);
-      const endpointCallback = (
-        stubsyInstance.app[endpointBehaviour.type] as jest.Mock
-      ).mock.calls.slice(-1)[0][1]; // second argument of the last call
-
-      endpointCallback(undefined, responseMock);
-
-      expect(responseMock.status).toHaveBeenCalledWith(
-        overrideBehaviour.status
-      );
-      expect(responseMock.send).toHaveBeenCalledWith(
-        overrideBehaviour.responseBody
+        endpointCallback
       );
     });
   });
 
   describe(`registerOverride`, () => {
     beforeEach(() => {
-      consoleErrorSpy.mockImplementation(() => undefined);
       stubsyInstance = new Stubsy(portNumber);
     });
 
-    it(`should log an error if the specified endpoint doesn't exist`, () => {
+    it(`should throw an error if the specified endpoint doesn't exist`, () => {
       const endpointId = 'undefinedEndpoint';
-      stubsyInstance.registerOverride(endpointId, 'does not matter', undefined);
 
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        `Endpoint with id${endpointId} has not been defined`
-      );
+      expect(() => {
+        stubsyInstance.registerOverride(
+          endpointId,
+          'does not matter',
+          undefined
+        );
+      }).toThrow(`Endpoint with id${endpointId} has not been defined`);
     });
 
     it(`should initialise the endpoint's override Map if it doesn't exit`, () => {
@@ -275,7 +227,7 @@ describe(`Stubsy`, () => {
       );
     });
 
-    it(`should log an error if an override with the same id has already been set`, () => {
+    it(`should throw an error if an override with the same id has already been set`, () => {
       const endpointId = 'movies';
       const overrideId = '404';
       const overrideBehaviour: OverrideBehaviour = {
@@ -289,13 +241,14 @@ describe(`Stubsy`, () => {
         overrideId,
         overrideBehaviour
       );
-      stubsyInstance.registerOverride(
-        endpointId,
-        overrideId,
-        overrideBehaviour
-      );
 
-      expect(consoleErrorSpy).toHaveBeenLastCalledWith(
+      expect(() => {
+        stubsyInstance.registerOverride(
+          endpointId,
+          overrideId,
+          overrideBehaviour
+        );
+      }).toThrow(
         `An override with id ${overrideId} has already been set for endpoint ${endpointId}`
       );
     });
