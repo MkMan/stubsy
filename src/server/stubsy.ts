@@ -21,13 +21,13 @@ import type {
 } from './types';
 
 export class Stubsy {
-  private app: Express;
+  public app: Express;
 
   private endpoints: StubsyEndpoints = new Map();
   private overrides: StubsyOverrides = new Map();
   private activeOverrides: StubsyActiveOverrides = new Map();
 
-  constructor(private portNumber: number) {
+  constructor(private portNumber?: number) {
     this.app = express();
     this.portNumber = portNumber;
 
@@ -36,7 +36,16 @@ export class Stubsy {
     this.initialiseConfigRoute();
   }
 
+  /**
+   * Starts the server at the portNumber specified in the constructor
+   *
+   * @deprecated Please use the instance variable `app` to start the server
+   */
   public start(): http.Server {
+    assert(
+      typeof this.portNumber !== 'undefined',
+      'portNumber not specified in the constructor'
+    );
     console.log(
       `Stubsy is now listening on port ${this.portNumber}\nThe Stubsy UI can be accessed on http://localhost:${this.portNumber}/Stubsy`
     );

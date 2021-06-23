@@ -133,6 +133,14 @@ describe(`Stubsy`, () => {
         stubsyInstance.portNumber
       );
     });
+
+    it(`should throw an error if the portNumber is not defined when creating Stubsy`, () => {
+      const badStubsy = new Stubsy();
+
+      expect(() => {
+        badStubsy.start();
+      }).toThrow('portNumber not specified in the constructor');
+    });
   });
 
   describe(`registerEndpoint`, () => {

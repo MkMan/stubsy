@@ -59,7 +59,12 @@ type OverrideBehaviour = {
 
 Creates an instance of `Stubsy`.
 
-* `portNumber` \<Number\> **required**: the port for the server to run on
+* `portNumber` \<Number\>: the port for the server to run on
+
+#### `stubsy.app`
+
+The underlying Express app. Use this instance variable to add more endpoints if needed
+and to start the server.
 
 #### `stubsy.registerEndpoint(endpointId, endpointBehaviour)`
 
@@ -86,7 +91,7 @@ the override on
 * `overrideId` \<String\>: the id of the override to activate. If omitted
 restores the override to the default behaviour.
 
-#### `stubsy.start()`
+#### ~~`stubsy.start()`~~ **Deprecated**
 
 Starts the server on the port number specified.
 
@@ -97,7 +102,7 @@ Starts the server on the port number specified.
 import { Stubsy } from 'stubsy';
 
 const stubsyPortNumber = 3000;
-const stubsy = new Stubsy(stubsyPortNumber);
+const stubsy = new Stubsy();
 
 stubsy.registerEndpoint('films', {
   path: '/films',
@@ -111,5 +116,5 @@ stubsy.registerOverride('films', 'outage', { status: 500, responseBody: {} });
 
 stubsy.activateOverride('films', 'outage');
 
-stubsy.start();
+stubsy.app.listen(stubsyPortNumber);
 ```
