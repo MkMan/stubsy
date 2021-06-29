@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/MkMan/stubsy/compare/v1.2.0...v1.2.1) (2021-06-29)
+
+
+### Bug Fixes
+
+* update README ([132f404](https://github.com/MkMan/stubsy/commit/132f4049f77c521639e71da34b5159ba88d1291a))
+
 # [1.2.0](https://github.com/MkMan/stubsy/compare/v1.1.0...v1.2.0) (2021-06-23)
 
 
