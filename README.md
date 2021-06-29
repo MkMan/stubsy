@@ -35,10 +35,13 @@ behaviour. An endpoint's behaviour is defined as follows.
 type EndpointBehaviour = {
   path: string; // the route at which the endpoint is accessed
   responseBody: unknown;
-  status: 200 | 404 | 500;
-  type: 'get' | 'post' | 'put' | 'delete';
+  status: number;
+  type: 'get' | 'post' | 'put' | 'delete' | 'patch';
 };
 ```
+
+**Note**: the `path` field can be any valid
+[Express path](http://expressjs.com/en/guide/routing.html#route-paths).
 
 #### Override
 
@@ -49,7 +52,7 @@ response. The override behaviour is defined as follows. The `path` and
 ```ts
 type OverrideBehaviour = {
   responseBody: unknown;
-  status: 200 | 404 | 500;
+  status: number;
 };
 ```
 
