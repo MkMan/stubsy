@@ -1,3 +1,10 @@
+## [1.2.2](https://github.com/MkMan/stubsy/compare/v1.2.1...v1.2.2) (2022-01-05)
+
+
+### Bug Fixes
+
+* upgrade body-parser from 1.19.0 to 1.19.1 ([fa42b7b](https://github.com/MkMan/stubsy/commit/fa42b7bb8a1d42609d39a5e6a1e2c89ea621b455))
+
 ## [1.2.1](https://github.com/MkMan/stubsy/compare/v1.2.0...v1.2.1) (2021-06-29)
 
 
