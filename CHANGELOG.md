@@ -1,3 +1,10 @@
+## [1.2.3](https://github.com/MkMan/stubsy/compare/v1.2.2...v1.2.3) (2022-01-11)
+
+
+### Bug Fixes
+
+* upgrade express from 4.17.1 to 4.17.2 ([995305c](https://github.com/MkMan/stubsy/commit/995305c267fb4d0ccd531e7877f959439bdbd5d0))
+
 ## [1.2.2](https://github.com/MkMan/stubsy/compare/v1.2.1...v1.2.2) (2022-01-05)
 
 
