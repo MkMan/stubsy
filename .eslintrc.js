@@ -18,15 +18,23 @@ module.exports = {
     ecmaVersion: 12,
     sourceType: 'module',
   },
+  settings: {
+    react: {
+      version: 'detect',
+    },
+  },
   plugins: ['react', '@typescript-eslint'],
   rules: {
     'no-unused-vars': 'off',
     'react/prop-types': 'off',
     '@typescript-eslint/no-unused-vars': ['error', { args: 'none' }],
   },
-  settings: {
-    react: {
-      version: 'detect',
+  overrides: [
+    {
+      files: ['*.spec.ts'],
+      rules: {
+        '@typescript-eslint/no-explicit-any': 'off',
+      },
     },
-  },
+  ],
 };

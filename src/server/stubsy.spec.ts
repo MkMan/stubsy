@@ -3,305 +3,232 @@ import mockExpress, {
   mockExpressStatic,
 } from '../../__mocks__/express';
 import { json } from '../../__mocks__/body-parser';
-import * as stubsyUtilities from './utility';
 import path from 'path';
-import { Stubsy } from './stubsy';
-import type { EndpointBehaviour, OverrideBehaviour } from './types';
+import * as utils from './utility/utility';
+import { StubsyState } from './state';
+import {
+  activateOverride,
+  createServer,
+  registerEndpoint,
+  registerOverride,
+} from './stubsy';
+import type { Endpoint, Override } from './types';
+
+jest.mock('./state/state');
 
 describe(`Stubsy`, () => {
-  const portNumber = 0;
-
-  let generateUiConfigResponseSpy: jest.SpyInstance;
-  let consoleLogSpy: jest.SpyInstance;
-  let assertSpy: jest.SpyInstance;
-  let generateEndpointCallbackSpy: jest.SpyInstance;
-  const responseMock = {
+  const mockResponseObject = {
     send: jest.fn(),
-    status: jest.fn(),
   };
-
-  let stubsyInstance: any;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    generateUiConfigResponseSpy = jest.spyOn(
-      stubsyUtilities,
-      'generateUiConfigResponse'
-    );
-    consoleLogSpy = jest.spyOn(console, 'log');
-    assertSpy = jest.spyOn(stubsyUtilities, 'assert');
-    generateEndpointCallbackSpy = jest.spyOn(
-      stubsyUtilities,
-      'generateEndpointCallback'
-    );
   });
 
-  afterEach(() => {
-    consoleLogSpy.mockRestore();
-    assertSpy.mockRestore();
-    generateEndpointCallbackSpy.mockRestore();
-  });
+  describe(`#createServer`, () => {
+    it(`should create and return a server if one is not provided`, () => {
+      const app = createServer();
 
-  describe(`constructor`, () => {
-    const mockUiResponse = '2 + 2 = 4';
-
-    beforeEach(() => {
-      generateUiConfigResponseSpy.mockReturnValue(mockUiResponse as any);
-
-      stubsyInstance = new Stubsy(portNumber);
-    });
-
-    it(`should create an Express app`, () => {
       expect(mockExpress).toHaveBeenCalled();
-      expect(stubsyInstance.app).toBe(mockExpressFunctions);
+      expect(app).toBe(mockExpress());
     });
 
-    it(`should initialise the portNumber instance variable`, () => {
-      expect(stubsyInstance.portNumber).toEqual(portNumber);
+    it(`should not create a server if one is provided`, () => {
+      const myExistingServer = mockExpress();
+      mockExpress.mockClear();
+
+      const app = createServer(myExistingServer as any);
+
+      expect(mockExpress).not.toHaveBeenCalled();
+      expect(app).toBe(myExistingServer);
     });
 
     it(`should initialise the json middleware`, () => {
+      createServer();
+
       expect(json).toHaveBeenCalled();
     });
 
-    it(`should initialise the UI route`, () => {
+    it(`should initialise the static files routes`, () => {
+      createServer();
+
       expect(mockExpressStatic).toHaveBeenCalledWith(
         path.resolve(__dirname, './ui/')
       );
-      expect(stubsyInstance.app.use).toHaveBeenCalledWith(
+      expect(mockExpressFunctions.use).toHaveBeenCalledWith(
         '/Stubsy',
         mockExpressStatic.getMockImplementation()?.()
       );
     });
 
-    it(`should initialise the Config route`, () => {
-      const requestMock = {
+    it(`should set up the POST config route`, () => {
+      const mockRequestObject = {
         body: {
-          endpointId: 'endpointId',
-          overrideId: 'overrideId',
+          endpointId: 'books',
+          overrideId: 'outage',
         },
       };
-      jest.spyOn(stubsyInstance, 'activateOverride');
-      const postConfigCallback = (stubsyInstance.app.post as jest.Mock).mock
-        .calls[0][1];
-      postConfigCallback(requestMock, responseMock);
-      const getConfigCallback = (stubsyInstance.app.get as jest.Mock).mock
-        .calls[0][1];
 
-      postConfigCallback(requestMock, responseMock);
-      getConfigCallback(requestMock, responseMock);
+      createServer();
+      const routeCallbackFunction = mockExpressFunctions.post.mock.calls[0][1];
+      routeCallbackFunction(mockRequestObject, mockResponseObject);
 
-      expect(stubsyInstance.app.post).toHaveBeenCalledWith(
+      expect(mockExpressFunctions.post).toHaveBeenCalledWith(
         '/Stubsy/Config',
         expect.any(Function)
       );
-      expect(stubsyInstance.activateOverride).toHaveBeenCalledWith(
-        requestMock.body.endpointId,
-        requestMock.body.overrideId
-      );
-      expect(responseMock.send).toHaveBeenCalledWith({ status: 'OK' });
+      expect(mockResponseObject.send).toHaveBeenCalledWith({ status: 'OK' });
+    });
 
-      expect(stubsyInstance.app.get).toHaveBeenCalledWith(
+    it(`should set up the GET config route`, () => {
+      const mockUiConfig = { route: 'yes' };
+      jest
+        .spyOn(utils, 'generateUiConfigResponse')
+        .mockReturnValue(mockUiConfig as any);
+
+      createServer();
+      const routeCallbackFunction = mockExpressFunctions.get.mock.calls[0][1];
+      routeCallbackFunction(null, mockResponseObject);
+
+      expect(mockExpressFunctions.get).toHaveBeenCalledWith(
         '/Stubsy/Config',
         expect.any(Function)
       );
-      expect(stubsyUtilities.generateUiConfigResponse).toHaveBeenCalledWith(
-        stubsyInstance.endpoints,
-        stubsyInstance.overrides,
-        stubsyInstance.activeOverrides
-      );
-      expect(responseMock.send).toHaveBeenCalledWith(mockUiResponse);
+      expect(mockResponseObject.send).toHaveBeenCalledWith(mockUiConfig);
     });
   });
 
-  describe(`start`, () => {
-    beforeEach(() => {
-      consoleLogSpy.mockImplementation(() => undefined);
+  describe(`#activateOverride`, () => {
+    it(`should call setActiveOverride`, () => {
+      const endpointId = 'books';
+      const overrideId = '404';
 
-      stubsyInstance = new Stubsy(portNumber);
-      stubsyInstance.start();
-    });
+      activateOverride(endpointId, overrideId);
 
-    it(`should log how to access the server to the user`, () => {
-      expect(consoleLogSpy).toHaveBeenCalledWith(
-        `Stubsy is now listening on port ${portNumber}\nThe Stubsy UI can be accessed on http://localhost:${portNumber}/Stubsy`
+      expect(StubsyState.getInstance().setActiveOverride).toHaveBeenCalledWith(
+        endpointId,
+        overrideId
       );
     });
 
-    it(`should start the server on the port number specified`, () => {
-      expect(stubsyInstance.app.listen).toHaveBeenCalledWith(
-        stubsyInstance.portNumber
+    it(`should use the default overrideId when it's not provided`, () => {
+      const endpointId = 'books';
+
+      activateOverride(endpointId);
+
+      expect(StubsyState.getInstance().setActiveOverride).toHaveBeenCalledWith(
+        endpointId,
+        'none'
       );
-    });
-
-    it(`should throw an error if the portNumber is not defined when creating Stubsy`, () => {
-      const badStubsy = new Stubsy();
-
-      expect(() => {
-        badStubsy.start();
-      }).toThrow('portNumber not specified in the constructor');
     });
   });
 
-  describe(`registerEndpoint`, () => {
-    const endpointId = 'myAwesomeEndpoint';
-    const endpointBehaviour: EndpointBehaviour = {
+  describe(`#registerEndpoint`, () => {
+    const mockApp = mockExpress() as any;
+    const endpoint: Endpoint = {
+      endpointId: 'myAwesomeEndpoint',
       path: '/planes',
       type: 'get',
       status: 200,
       responseBody: {},
     };
 
-    beforeEach(() => {
-      stubsyInstance = new Stubsy(portNumber);
-    });
-
     it(`should throw an error if the endpointId already exists`, () => {
-      stubsyInstance.endpoints.set(endpointId, endpointBehaviour);
+      (
+        StubsyState.getInstance().endpointExists as jest.Mock
+      ).mockReturnValueOnce(true);
 
       expect(() => {
-        stubsyInstance.registerEndpoint(endpointId, endpointBehaviour);
-      }).toThrow(`Endpoint with id ${endpointId} has already been defined`);
+        registerEndpoint(mockApp, endpoint);
+      }).toThrow(
+        `Endpoint with id ${endpoint.endpointId} has already been defined`
+      );
     });
 
     it(`should add the endpoint to the instance if the endpointId is not defined`, () => {
-      stubsyInstance.registerEndpoint(endpointId, endpointBehaviour);
+      registerEndpoint(mockApp, endpoint);
+      const { endpointId, ...endpointBehaviour } = endpoint;
 
-      expect(stubsyInstance.endpoints.get(endpointId)).toEqual(
-        endpointBehaviour
+      expect(StubsyState.getInstance().addEndpoint).toHaveBeenCalledWith(
+        endpointId,
+        {
+          ...endpointBehaviour,
+        }
       );
     });
 
     it(`should create an Express endpoint matching the specified behaviour`, () => {
       const endpointCallback = () => 'wazah';
-      generateEndpointCallbackSpy.mockImplementation(() => endpointCallback);
+      jest
+        .spyOn(utils, 'generateEndpointCallback')
+        .mockImplementationOnce(() => endpointCallback);
 
-      stubsyInstance.registerEndpoint(endpointId, endpointBehaviour);
+      registerEndpoint(mockApp, endpoint);
 
-      expect(stubsyInstance.app[endpointBehaviour.type]).toHaveBeenCalledWith(
-        endpointBehaviour.path,
+      expect(mockApp[endpoint.type]).toHaveBeenCalledWith(
+        endpoint.path,
         endpointCallback
       );
     });
   });
 
-  describe(`registerOverride`, () => {
-    beforeEach(() => {
-      stubsyInstance = new Stubsy(portNumber);
-    });
-
+  describe(`#registerOverride`, () => {
     it(`should throw an error if the specified endpoint doesn't exist`, () => {
+      (
+        StubsyState.getInstance().endpointExists as jest.Mock
+      ).mockReturnValueOnce(false);
       const endpointId = 'undefinedEndpoint';
 
       expect(() => {
-        stubsyInstance.registerOverride(
-          endpointId,
-          'does not matter',
-          undefined
-        );
+        registerOverride(endpointId, 'does not matter' as any);
       }).toThrow(`Endpoint with id${endpointId} has not been defined`);
-    });
-
-    it(`should initialise the endpoint's override Map if it doesn't exit`, () => {
-      const endpointId = 'movies';
-      const overrideId = '404';
-      const overrideBehaviour: OverrideBehaviour = {
-        status: 404,
-        responseBody: {},
-      };
-      const numberOfOverridesBefore = stubsyInstance.overrides.size;
-
-      stubsyInstance.endpoints.set(endpointId, undefined);
-
-      stubsyInstance.registerOverride(
-        endpointId,
-        overrideId,
-        overrideBehaviour
-      );
-
-      expect(stubsyInstance.overrides.size).toEqual(
-        numberOfOverridesBefore + 1
-      );
-      expect(stubsyInstance.overrides.get(endpointId).get(overrideId)).toBe(
-        overrideBehaviour
-      );
     });
 
     it(`should throw an error if an override with the same id has already been set`, () => {
       const endpointId = 'movies';
-      const overrideId = '404';
-      const overrideBehaviour: OverrideBehaviour = {
+      const overrideId = 'notFound';
+      const override: Override = {
+        overrideId,
         status: 404,
         responseBody: {},
       };
 
-      stubsyInstance.endpoints.set(endpointId, undefined);
-      stubsyInstance.registerOverride(
-        endpointId,
-        overrideId,
-        overrideBehaviour
-      );
+      (
+        StubsyState.getInstance().endpointExists as jest.Mock
+      ).mockReturnValueOnce(true);
+      (
+        StubsyState.getInstance().overrideExists as jest.Mock
+      ).mockReturnValueOnce(true);
 
       expect(() => {
-        stubsyInstance.registerOverride(
-          endpointId,
-          overrideId,
-          overrideBehaviour
-        );
+        registerOverride(endpointId, override);
       }).toThrow(
         `An override with id ${overrideId} has already been set for endpoint ${endpointId}`
       );
     });
 
     it(`should add the specified override to the previous overrides for the endpoint`, () => {
+      (
+        StubsyState.getInstance().endpointExists as jest.Mock
+      ).mockReturnValueOnce(true);
+      (
+        StubsyState.getInstance().overrideExists as jest.Mock
+      ).mockReturnValueOnce(false);
       const endpointId = 'movies';
-      const override1Id = '404';
-      const override2Id = '500';
-      const override1Behaviour: OverrideBehaviour = {
-        status: 404,
-        responseBody: {},
-      };
-      const override2Behaviour: OverrideBehaviour = {
-        status: 500,
-        responseBody: {},
+      const overrideId = '404';
+      const overrideBehaviour = { status: 404, responseBody: {} };
+      const override: Override = {
+        overrideId,
+        ...overrideBehaviour,
       };
 
-      stubsyInstance.endpoints.set(endpointId, undefined);
-      stubsyInstance.registerOverride(
+      registerOverride(endpointId, override);
+
+      expect(StubsyState.getInstance().addOverride).toHaveBeenCalledWith(
         endpointId,
-        override1Id,
-        override1Behaviour
+        overrideId,
+        overrideBehaviour
       );
-      stubsyInstance.registerOverride(
-        endpointId,
-        override2Id,
-        override2Behaviour
-      );
-
-      expect(stubsyInstance.overrides.get(endpointId).size).toEqual(2);
-    });
-  });
-
-  describe(`activateOverride`, () => {
-    const endpointId = 'endpoint';
-    const overrideId = 'override';
-
-    beforeEach(() => {
-      stubsyInstance = new Stubsy(portNumber);
-    });
-
-    it(`should set the active overrides when the override id is specified`, () => {
-      stubsyInstance.activateOverride(endpointId, overrideId);
-
-      expect(stubsyInstance.activeOverrides.get(endpointId)).toEqual(
-        overrideId
-      );
-    });
-
-    it(`should set the active overrides when the override id is omitted`, () => {
-      stubsyInstance.activateOverride(endpointId);
-
-      expect(stubsyInstance.activeOverrides.get(endpointId)).toEqual('none');
     });
   });
 });

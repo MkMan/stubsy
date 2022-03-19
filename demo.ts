@@ -1,32 +1,41 @@
-import { Stubsy } from './dist';
+import {
+  createServer,
+  registerEndpoint,
+  registerOverride,
+  activateOverride,
+} from './dist';
 
-const stubsy = new Stubsy();
+const app = createServer();
 
-stubsy.registerEndpoint('books', {
+registerEndpoint(app, {
+  endpointId: 'books',
   path: '/books',
   status: 200,
   type: 'get',
   responseBody: [{ title: 'Divine reality' }, { title: 'The sealed nectar' }],
 });
 
-stubsy.registerOverride('books', 'error', {
+registerOverride('books', {
+  overrideId: 'error',
   status: 404,
   responseBody: { message: 'resource not found' },
 });
-stubsy.registerOverride('books', 'outage', {
+registerOverride('books', {
+  overrideId: 'outage',
   status: 500,
   responseBody: { message: 'server outage' },
 });
 
-stubsy.activateOverride('books', 'error');
+activateOverride('books', 'error');
 
-stubsy.registerEndpoint('magazines', {
+registerEndpoint(app, {
+  endpointId: 'magazines',
   path: '/magazines',
   status: 200,
   type: 'get',
   responseBody: [{ title: 'Divine reality' }, { title: 'The sealed nectar' }],
 });
 
-stubsy.app.listen(3000, () => {
+app.listen(3000, () => {
   console.log('The Stubsy UI can be accessed on http://localhost:3000/Stubsy');
 });

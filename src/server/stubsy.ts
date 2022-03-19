@@ -1,6 +1,6 @@
-import express, { Express } from 'express';
+import express from 'express';
+import type { Express } from 'express';
 import { json } from 'body-parser';
-import http from 'http';
 import path from 'path';
 
 import {
@@ -10,132 +10,69 @@ import {
 } from './utility';
 import type {
   ConfigPayload,
-  ConfigResponseEntry,
-  EndpointBehaviour,
+  Endpoint,
   EndpointId,
-  OverrideBehaviour,
+  Override,
   OverrideId,
-  StubsyActiveOverrides,
-  StubsyEndpoints,
-  StubsyOverrides,
 } from './types';
+import { StubsyState } from './state';
 
-export class Stubsy {
-  public app: Express;
+export const createServer = (app: Express = express()): Express => {
+  app.use(json());
+  app.use('/Stubsy', express.static(path.resolve(__dirname, './ui/')));
 
-  private endpoints: StubsyEndpoints = new Map();
-  private overrides: StubsyOverrides = new Map();
-  private activeOverrides: StubsyActiveOverrides = new Map();
+  app.post('/Stubsy/Config', (req, res, next) => {
+    const { endpointId, overrideId }: ConfigPayload = req.body;
 
-  constructor(private portNumber?: number) {
-    this.app = express();
-    this.portNumber = portNumber;
+    activateOverride(endpointId, overrideId);
+    res.send({ status: 'OK' });
+  });
 
-    this.initialiseMiddleWare();
-    this.initialiseUiRoute();
-    this.initialiseConfigRoute();
-  }
+  app.get('/Stubsy/Config', (req, res, next) => {
+    res.send(generateUiConfigResponse());
+  });
 
-  /**
-   * Starts the server at the portNumber specified in the constructor
-   *
-   * @deprecated Please use the instance variable `app` to start the server
-   */
-  public start(): http.Server {
-    assert(
-      typeof this.portNumber !== 'undefined',
-      'portNumber not specified in the constructor'
-    );
-    console.log(
-      `Stubsy is now listening on port ${this.portNumber}\nThe Stubsy UI can be accessed on http://localhost:${this.portNumber}/Stubsy`
-    );
-    return this.app.listen(this.portNumber);
-  }
+  return app;
+};
 
-  public registerEndpoint(
-    endpointId: EndpointId,
-    endpointBehaviour: EndpointBehaviour
-  ): void {
-    assert(
-      !this.endpoints.has(endpointId),
-      `Endpoint with id ${endpointId} has already been defined`
-    );
+export const activateOverride = (
+  endpointId: EndpointId,
+  overrideId: OverrideId = 'none'
+): void => {
+  StubsyState.getInstance().setActiveOverride(endpointId, overrideId);
+};
 
-    this.endpoints.set(endpointId, endpointBehaviour);
+export const registerEndpoint = (app: Express, endpoint: Endpoint): void => {
+  const state = StubsyState.getInstance();
+  const { endpointId, ...endpointBehaviour } = endpoint;
 
-    const { type, path } = endpointBehaviour;
+  assert(
+    !state.endpointExists(endpointId),
+    `Endpoint with id ${endpointId} has already been defined`
+  );
 
-    this.app[type](
-      path,
-      generateEndpointCallback({
-        defaultStatus: endpointBehaviour.status,
-        defaultResponseBody: endpointBehaviour.responseBody,
-        activeOverrides: this.activeOverrides,
-        overrides: this.overrides,
-        endpointId,
-      })
-    );
-  }
+  const { type, path } = endpointBehaviour;
 
-  public registerOverride(
-    endpointId: EndpointId,
-    overrideId: OverrideId,
-    overrideBehaviour: OverrideBehaviour
-  ): void {
-    assert(
-      this.endpoints.has(endpointId),
-      `Endpoint with id${endpointId} has not been defined`
-    );
+  state.addEndpoint(endpointId, endpointBehaviour);
+  app[type](path, generateEndpointCallback(endpoint));
+};
 
-    const overridesForEndpoint = this.overrides.get(endpointId);
+export const registerOverride = (
+  endpointId: EndpointId,
+  override: Override
+): void => {
+  const state = StubsyState.getInstance();
+  const { overrideId, ...overrideBehaviour } = override;
 
-    assert(
-      !overridesForEndpoint?.has(overrideId),
-      `An override with id ${overrideId} has already been set for endpoint ${endpointId}`
-    );
+  assert(
+    state.endpointExists(endpointId),
+    `Endpoint with id${endpointId} has not been defined`
+  );
 
-    if (!overridesForEndpoint) {
-      this.overrides.set(
-        endpointId,
-        new Map().set(overrideId, overrideBehaviour)
-      );
-      return;
-    }
+  assert(
+    !state.overrideExists(endpointId, overrideId),
+    `An override with id ${overrideId} has already been set for endpoint ${endpointId}`
+  );
 
-    overridesForEndpoint.set(overrideId, overrideBehaviour);
-  }
-
-  public activateOverride(
-    endpointId: EndpointId,
-    overrideId: OverrideId = 'none'
-  ): void {
-    this.activeOverrides.set(endpointId, overrideId);
-  }
-
-  private initialiseMiddleWare(): void {
-    this.app.use(json());
-  }
-
-  private initialiseUiRoute(): void {
-    this.app.use('/Stubsy', express.static(path.resolve(__dirname, './ui/')));
-  }
-
-  private initialiseConfigRoute(): void {
-    this.app.post('/Stubsy/Config', (req, res, next) => {
-      const { endpointId, overrideId }: ConfigPayload = req.body;
-
-      this.activateOverride(endpointId, overrideId);
-      res.send({ status: 'OK' });
-    });
-
-    this.app.get('/Stubsy/Config', (req, res, next) => {
-      const response: ConfigResponseEntry[] = generateUiConfigResponse(
-        this.endpoints,
-        this.overrides,
-        this.activeOverrides
-      );
-
-      res.send(response);
-    });
-  }
-}
+  state.addOverride(endpointId, overrideId, overrideBehaviour);
+};
