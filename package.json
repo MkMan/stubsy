@@ -56,6 +56,8 @@
     "eslint-plugin-react-hooks": "^4.2.0",
     "husky": "^6.0.0",
     "jest": "^27.0.4",
+    "jest-progress-bar-reporter": "^1.0.21",
+    "jest-watch-typeahead": "^0.6.4",
     "lint-staged": "^11.0.0",
     "markdownlint": "^0.23.1",
     "markdownlint-cli": "^0.27.1",
