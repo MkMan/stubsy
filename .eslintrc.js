@@ -31,9 +31,17 @@ module.exports = {
   },
   overrides: [
     {
-      files: ['*.spec.ts'],
+      files: ['*.spec.ts', '*.spec.tsx'],
       rules: {
         '@typescript-eslint/no-explicit-any': 'off',
+      },
+    },
+    {
+      files: ['*.spec.tsx'],
+      plugins: ['testing-library'],
+      extends: ['plugin:testing-library/react'],
+      rules: {
+        'react/display-name': 'off',
       },
     },
   ],
