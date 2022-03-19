@@ -1,15 +1,9 @@
 # Stubsy
 
-* [Installation](#installation)
-* [Usage](#usage)
-  * [Definitions](#definitions)
-  * [API](#api)
-  * [Example](#example)
-
 Stubsy is a Node server built using Express. Its main goal is to allow
-developers to easily set up the server but more importantly change its
+developers to easily set up a mock backend server and change its
 behaviour after launch. This can be useful to test how the UI behaves
-when an endpoint's response is `404` instead `200` for example.
+with different responses from the backend.
 
 Stubsy ships with a UI to show the set up of the server and allow
 changing endpoint's behaviour.
@@ -28,11 +22,12 @@ npm install --save-dev stubsy
 
 #### Endpoint
 
-An `Endpoint` is REST endpoint, that is set up with a default
-behaviour. An endpoint's behaviour is defined as follows.
+An `Endpoint` is a REST endpoint that is set up with a default behaviour.
+Its TypeScript definition is:
 
 ```ts
 type EndpointBehaviour = {
+  endpointId: string;
   path: string; // the route at which the endpoint is accessed
   responseBody: unknown;
   status: number;
@@ -46,11 +41,11 @@ type EndpointBehaviour = {
 #### Override
 
 An `Override` is an overriding behaviour for an Endpoint to alter its
-response. The override behaviour is defined as follows. The `path` and
-`type` of the endpoint cannot be changed in an `Override`.
+response. Its TypeScript definition is:
 
 ```ts
 type OverrideBehaviour = {
+  overrideId: string;
   responseBody: unknown;
   status: number;
 };
@@ -58,66 +53,71 @@ type OverrideBehaviour = {
 
 ### API
 
-#### `new Stubsy(portNumber)`
+#### `createServer(expressApp): Express`
 
-Creates an instance of `Stubsy`.
+Sets up Stubsy's routes and creates an Express app if one is not provided.
 
-* `portNumber` \<Number\>: the port for the server to run on
+- `expressApp` \<Express\>: an existing Express App for Stubsy to use
 
-#### `stubsy.app`
+**Returns** the expressApp argument (if provided) or the created Express app.
 
-The underlying Express app. Use this instance variable to add more endpoints if needed
-and to start the server.
-
-#### `stubsy.registerEndpoint(endpointId, endpointBehaviour)`
+#### `registerEndpoint(app, endpoint)`
 
 Registers endpoints to be accessed on the server.
 
-* `endpointId` \<String\> **required**: a unique identifier for the endpoint
-* `endpointBehaviour` \<EndpointBehaviour\> **required**: the endpoint's behaviour
+- `app` \<Express\> **required**: the return of `createServer`
+- `endpoint` \<Endpoint\> **required**: the endpoint's definition
 
-#### `stubsy.registerOverride(endpointId, overrideId, overrideBehaviour)`
+#### `registerOverride(endpointId, override)`
 
 Registers override behaviour for a previously defined endpoint.
 
-* `endpointId` \<String\> **required**: the id of the endpoint to register
+- `endpointId` \<String\> **required**: the id of the endpoint to register
 an override for
-* `overrideId` \<String\> **required**: a unique identifier for the override
-* `overrideBehaviour` \<OverrideBehaviour\> **required**: the override's behaviour
+- `override` \<Override\> **required**: the override's definition
 
-#### `stubsy.activateOverride(endpointId, overrideId)`
+#### `activateOverride(endpointId, overrideId)`
 
 Activates the specified override on the endpoint.
 
-* `endpointId` \<String\> **required**: the id of the endpoint to activate
+- `endpointId` \<String\> **required**: the id of the endpoint to activate
 the override on
-* `overrideId` \<String\>: the id of the override to activate. If omitted
+- `overrideId` \<String\>: the id of the override to activate. If omitted
 restores the override to the default behaviour.
-
-#### ~~`stubsy.start()`~~ **Deprecated**
-
-Starts the server on the port number specified.
 
 ### Example
 
 ```js
 // server.js
-import { Stubsy } from 'stubsy';
+import { 
+  createServer,
+  registerEndpoint,
+  registerOverride,
+  activateOverride
+} from 'stubsy';
 
-const stubsyPortNumber = 3000;
-const stubsy = new Stubsy();
+const stubsy = new createServer();
 
-stubsy.registerEndpoint('films', {
+registerEndpoint(stubsy, {
+  endpointId: 'films',
   path: '/films',
   status: 200,
   type: 'get',
   responseBody: [{ title: 'Inception' }, { title: 'Tenet' }],
 });
 
-stubsy.registerOverride('films', 'error', { status: 404, responseBody: {} });
-stubsy.registerOverride('films', 'outage', { status: 500, responseBody: {} });
+registerOverride('films',{
+    overrideId: 'error',
+    status: 404,
+    responseBody: {}
+});
+registerOverride('films',{
+    overrideId: 'outage',
+    status: 500,
+    responseBody: {}
+});
 
-stubsy.activateOverride('films', 'outage');
+activateOverride('films', 'outage');
 
-stubsy.app.listen(stubsyPortNumber);
+stubsy.listen(stubsyPortNumber);
 ```

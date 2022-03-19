@@ -8,32 +8,32 @@ import {
 const app = createServer();
 
 registerEndpoint(app, {
-  endpointId: 'books',
-  path: '/books',
+  endpointId: 'movies',
+  path: '/movies',
   status: 200,
   type: 'get',
-  responseBody: [{ title: 'Divine reality' }, { title: 'The sealed nectar' }],
+  responseBody: [{ title: 'Inception' }, { title: 'Tenet' }],
 });
 
-registerOverride('books', {
-  overrideId: 'error',
+registerOverride('movies', {
+  overrideId: '404',
   status: 404,
   responseBody: { message: 'resource not found' },
 });
-registerOverride('books', {
-  overrideId: 'outage',
+registerOverride('movies', {
+  overrideId: '500',
   status: 500,
   responseBody: { message: 'server outage' },
 });
 
-activateOverride('books', 'error');
+activateOverride('movies', '500');
 
 registerEndpoint(app, {
-  endpointId: 'magazines',
-  path: '/magazines',
+  endpointId: 'books',
+  path: '/books',
   status: 200,
   type: 'get',
-  responseBody: [{ title: 'Divine reality' }, { title: 'The sealed nectar' }],
+  responseBody: [{ title: 'Divine reality' }, { title: 'The Sealed Nectar' }],
 });
 
 app.listen(3000, () => {
