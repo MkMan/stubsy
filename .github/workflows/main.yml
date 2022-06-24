@@ -12,7 +12,6 @@ jobs:
       - name: Setup Node.js environment
         uses: actions/setup-node@v3
         with:
-          cache: 'pnpm'
           node-version-file: '.nvmrc'
 
       - name: Store branch name
