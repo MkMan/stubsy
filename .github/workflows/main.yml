@@ -23,7 +23,7 @@ jobs:
         run: echo "BRANCH_NAME=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
 
       - name: Install Dependencies
-        run: pnpm install
+        run: pnpm i --shamefully-hoist # https://github.com/pnpm/pnpm/issues/1661#issuecomment-573262960
 
       - name: Fetch Quality test reporter
         run: |
