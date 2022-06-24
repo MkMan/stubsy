@@ -7,7 +7,7 @@ import {
   assert,
   generateEndpointCallback,
   generateUiConfigResponse,
-} from './utility';
+} from '../utility';
 import type {
   ConfigPayload,
   ConfigResponseEntry,
@@ -18,7 +18,7 @@ import type {
   StubsyActiveOverrides,
   StubsyEndpoints,
   StubsyOverrides,
-} from './types';
+} from '../types';
 
 export class Stubsy {
   public app: Express;
@@ -117,7 +117,7 @@ export class Stubsy {
   }
 
   private initialiseUiRoute(): void {
-    this.app.use('/Stubsy', express.static(path.resolve(__dirname, './ui/')));
+    this.app.use('/Stubsy', express.static(path.resolve(__dirname, '../ui/')));
   }
 
   private initialiseConfigRoute(): void {

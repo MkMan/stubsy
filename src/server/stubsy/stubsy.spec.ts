@@ -1,12 +1,12 @@
 import mockExpress, {
   mockExpressFunctions,
   mockExpressStatic,
-} from '../../__mocks__/express';
-import { json } from '../../__mocks__/body-parser';
-import * as stubsyUtilities from './utility';
+} from '../../../__mocks__/express';
+import { json } from '../../../__mocks__/body-parser';
+import * as stubsyUtilities from '../utility/utility';
 import path from 'path';
 import { Stubsy } from './stubsy';
-import type { EndpointBehaviour, OverrideBehaviour } from './types';
+import type { EndpointBehaviour, OverrideBehaviour } from '../types';
 
 describe(`Stubsy`, () => {
   const portNumber = 0;
@@ -66,7 +66,7 @@ describe(`Stubsy`, () => {
 
     it(`should initialise the UI route`, () => {
       expect(mockExpressStatic).toHaveBeenCalledWith(
-        path.resolve(__dirname, './ui/')
+        path.resolve(__dirname, '../ui/')
       );
       expect(stubsyInstance.app.use).toHaveBeenCalledWith(
         '/Stubsy',

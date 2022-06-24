@@ -9,7 +9,7 @@ import type {
   StubsyActiveOverrides,
   OverrideBehaviour,
   EndpointBehaviour,
-} from './types';
+} from '../types';
 
 describe(`Stubsy Utility functions`, () => {
   beforeEach(() => {

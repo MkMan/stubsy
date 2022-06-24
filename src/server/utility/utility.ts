@@ -6,7 +6,7 @@ import type {
   StubsyActiveOverrides,
   EndpointBehaviour,
   EndpointId,
-} from './types';
+} from '../types';
 
 export function assert(condition: boolean, message: string): asserts condition {
   if (!condition) throw new Error(message);
