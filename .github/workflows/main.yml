@@ -12,15 +12,19 @@ jobs:
       - name: Setup Node.js environment
         uses: actions/setup-node@v3
         with:
-          cache: 'npm'
+          cache: 'pnpm'
           node-version-file: '.nvmrc'
 
       - name: Store branch name
         run: |
           echo "BRANCH_NAME=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
 
+      - name: Install pnpm
+        run: |
+          npm install -g pnpm@7.3.0
+
       - name: Install Dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Fetch Quality test reporter
         run: |
@@ -34,11 +38,11 @@ jobs:
           GIT_BRANCH: ${{ env.BRANCH_NAME }}
         run: |
           ./cc-test-reporter before-build
-          npm run test
+          pnpm test
           ./cc-test-reporter after-build
         
       - name: Build project
-        run: npm run build
+        run: pnpm build
         
       - name: Run Semantic Release
         env:

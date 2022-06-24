@@ -12,10 +12,10 @@
     "build-server": "tsc -p ./tsconfig-server.json",
     "build-ui:watch": "parcel watch --public-url /Stubsy/ --out-dir dist/ui src/ui/index.html",
     "build-ui": "parcel build --public-url /Stubsy/ --out-dir dist/ui src/ui/index.html",
-    "build": "npm run build-server && npm run build-ui",
+    "build": "pnpm build-server && pnpm build-ui",
     "format": "prettier --write ./**/*.{ts,tsx,scss,html} && eslint --fix . --ext .ts,.tsx",
     "prepare": "husky install",
-    "start": "npm run build-server && concurrently -k 'npm run build-server:watch' 'npm run build-ui:watch' 'nodemon --exec \"ts-node\" ./demo.ts'",
+    "start": "pnpm build-server && concurrently -k 'pnpm build-server:watch' 'pnpm build-ui:watch' 'nodemon --exec \"ts-node\" ./demo.ts'",
     "test:watch": "jest --watch",
     "test": "jest"
   },
