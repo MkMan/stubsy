@@ -7,12 +7,13 @@ jobs:
     name: Build, Test and Release
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Setup Node.js environment
-        uses: actions/setup-node@v2.1.5
+        uses: actions/setup-node@v3
         with:
-          node-version: 14.17.0
+          cache: 'npm'
+          node-version-file: '.nvmrc'
 
       - name: Store branch name
         run: |
