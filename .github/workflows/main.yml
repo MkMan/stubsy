@@ -9,21 +9,21 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - uses: pnpm/action-setup@v2.2.2
+        with:
+          version: 7.3.0
+
       - name: Setup Node.js environment
         uses: actions/setup-node@v3
         with:
+          cache: 'pnpm'
           node-version-file: '.nvmrc'
 
       - name: Store branch name
-        run: |
-          echo "BRANCH_NAME=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
-
-      - name: Install pnpm
-        run: |
-          npm install -g pnpm@7.3.0
+        run: echo "BRANCH_NAME=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
 
       - name: Install Dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install
 
       - name: Fetch Quality test reporter
         run: |
