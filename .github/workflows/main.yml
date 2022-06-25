@@ -37,7 +37,7 @@ jobs:
           GIT_BRANCH: ${{ env.BRANCH_NAME }}
         run: |
           ./cc-test-reporter before-build
-          pnpm test
+          pnpm test:unit
           ./cc-test-reporter after-build
         
       - name: Build project
