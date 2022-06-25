@@ -1,5 +1,4 @@
 export type EndpointId = string;
-
 export type OverrideId = string;
 
 export type EndpointBehaviour = {
@@ -8,11 +7,17 @@ export type EndpointBehaviour = {
   status: number;
   type: 'get' | 'post' | 'put' | 'delete' | 'patch';
 };
+export type Endpoint = {
+  endpointId: EndpointId;
+} & EndpointBehaviour;
 
 export type OverrideBehaviour = Pick<
   EndpointBehaviour,
   'status' | 'responseBody'
 >;
+export type Override = {
+  overrideId: OverrideId;
+} & OverrideBehaviour;
 
 export type ConfigPayload = {
   endpointId: EndpointId;
