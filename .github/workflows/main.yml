@@ -30,15 +30,18 @@ jobs:
           curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
           chmod +x ./cc-test-reporter
 
-      - name: Run Tests
+      - name: Run Unit Tests
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
           GIT_COMMIT_SHA: ${{ github.sha }}
           GIT_BRANCH: ${{ env.BRANCH_NAME }}
         run: |
           ./cc-test-reporter before-build
-          pnpm test
+          pnpm test:unit
           ./cc-test-reporter after-build
+
+      - name: Run E2E Tests
+        run: pnpm test:e2e
         
       - name: Build project
         run: pnpm build

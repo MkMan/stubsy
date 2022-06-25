@@ -105,12 +105,14 @@ const Overrides: FC<OverrideProps> = ({
               value="none"
               control={<Radio />}
               label="Default"
+              data-testid="default"
             />
             {overrides.map(({ overrideId }) => (
               <FormControlLabel
                 key={overrideId}
                 value={overrideId}
                 control={<Radio />}
+                data-testid={overrideId}
                 label={overrideId}
               />
             ))}
