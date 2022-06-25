@@ -16,7 +16,7 @@
     "format": "prettier --write ./**/*.{ts,tsx,scss,html} && eslint --fix . --ext .ts,.tsx",
     "prepare": "husky install",
     "start": "pnpm build-server && concurrently -k 'pnpm build-server:watch' 'pnpm build-ui:watch' 'nodemon --exec \"ts-node\" ./demo.ts'",
-    "test:e2e": "concurrently -k 'pnpm start' 'pnpm cypress run'",
+    "test:e2e": "concurrently -k 'pnpm start' 'wait-on http://localhost:3000/Stubsy && pnpm cypress run'",
     "test:e2e:watch": "concurrently -k 'pnpm start' 'pnpm cypress open'",
     "test:unit": "jest",
     "test:unit:watch": "jest --watch"
@@ -71,7 +71,8 @@
     "semantic-release": "17.4.3",
     "ts-jest": "27.0.2",
     "ts-node": "9.1.1",
-    "typescript": "4.3.2"
+    "typescript": "4.3.2",
+    "wait-on": "6.0.1"
   },
   "lint-staged": {
     "*.{js,ts,tsx}": "eslint --fix",
