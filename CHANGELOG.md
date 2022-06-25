@@ -1,3 +1,10 @@
+## [1.2.5](https://github.com/MkMan/stubsy/compare/v1.2.4...v1.2.5) (2022-06-25)
+
+
+### Bug Fixes
+
+* update dependencies ([a561b4b](https://github.com/MkMan/stubsy/commit/a561b4b93023599f77af13d94ac245e60be37f21))
+
 ## [1.2.4](https://github.com/MkMan/stubsy/compare/v1.2.3...v1.2.4) (2022-03-15)
 
 
