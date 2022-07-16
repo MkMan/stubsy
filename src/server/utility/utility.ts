@@ -1,22 +1,17 @@
 import { RequestHandler } from 'express';
-import type {
-  ConfigResponseEntry,
-  StubsyEndpoints,
-  StubsyOverrides,
-  StubsyActiveOverrides,
-  EndpointBehaviour,
-  EndpointId,
-} from '../types';
+import { StubsyState } from '../state/state';
+import type { ConfigResponseEntry, Endpoint } from '../types';
 
 export function assert(condition: boolean, message: string): asserts condition {
   if (!condition) throw new Error(message);
 }
 
-export const generateUiConfigResponse = (
-  endpoints: StubsyEndpoints,
-  appOverrides: StubsyOverrides,
-  activeOverrides: StubsyActiveOverrides
-): ConfigResponseEntry[] => {
+export const generateUiConfigResponse = (): ConfigResponseEntry[] => {
+  const {
+    endpoints,
+    overrides: appOverrides,
+    activeOverrides,
+  } = StubsyState.getInstance();
   const response: ConfigResponseEntry[] = [];
 
   endpoints.forEach(({ path, type }, endpointId) => {
@@ -40,21 +35,18 @@ export const generateUiConfigResponse = (
   return response;
 };
 
-export const generateEndpointCallback = ({
-  defaultStatus,
-  defaultResponseBody,
-  activeOverrides,
-  overrides,
-  endpointId,
-}: {
-  defaultStatus: EndpointBehaviour['status'];
-  defaultResponseBody: EndpointBehaviour['responseBody'];
-  activeOverrides: StubsyActiveOverrides;
-  overrides: StubsyOverrides;
-  endpointId: EndpointId;
-}): RequestHandler => {
+export const generateEndpointCallback = (
+  endpoint: Endpoint
+): RequestHandler => {
+  const state = StubsyState.getInstance();
+  const {
+    endpointId,
+    status: defaultStatus,
+    responseBody: defaultResponseBody,
+  } = endpoint;
+
   const callback: RequestHandler = (req, res, next) => {
-    const activeOverrideId = activeOverrides.get(endpointId);
+    const activeOverrideId = state.getActiveOverrideId(endpointId);
 
     if (activeOverrideId === 'none' || !activeOverrideId) {
       res.status(defaultStatus);
@@ -62,9 +54,8 @@ export const generateEndpointCallback = ({
       return;
     }
 
-    const activeOverrideBehaviour = overrides
-      .get(endpointId)
-      ?.get(activeOverrideId);
+    const activeOverrideBehaviour =
+      state.getActiveOverrideBehaviour(endpointId);
 
     if (!activeOverrideBehaviour) {
       res.status(500);

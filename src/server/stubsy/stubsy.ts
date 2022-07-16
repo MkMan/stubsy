@@ -15,21 +15,20 @@ import type {
   EndpointId,
   OverrideBehaviour,
   OverrideId,
-  StubsyActiveOverrides,
-  StubsyEndpoints,
-  StubsyOverrides,
 } from '../types';
+
+import { StubsyState } from '../state';
 
 export class Stubsy {
   public app: Express;
 
-  private endpoints: StubsyEndpoints = new Map();
-  private overrides: StubsyOverrides = new Map();
-  private activeOverrides: StubsyActiveOverrides = new Map();
+  private state: StubsyState;
 
   constructor(private portNumber?: number) {
     this.app = express();
     this.portNumber = portNumber;
+
+    this.state = StubsyState.getInstance();
 
     this.initialiseMiddleWare();
     this.initialiseUiRoute();
@@ -57,21 +56,18 @@ export class Stubsy {
     endpointBehaviour: EndpointBehaviour
   ): void {
     assert(
-      !this.endpoints.has(endpointId),
+      !this.state.endpointExists(endpointId),
       `Endpoint with id ${endpointId} has already been defined`
     );
 
-    this.endpoints.set(endpointId, endpointBehaviour);
+    this.state.addEndpoint(endpointId, endpointBehaviour);
 
     const { type, path } = endpointBehaviour;
 
     this.app[type](
       path,
       generateEndpointCallback({
-        defaultStatus: endpointBehaviour.status,
-        defaultResponseBody: endpointBehaviour.responseBody,
-        activeOverrides: this.activeOverrides,
-        overrides: this.overrides,
+        ...endpointBehaviour,
         endpointId,
       })
     );
@@ -83,33 +79,23 @@ export class Stubsy {
     overrideBehaviour: OverrideBehaviour
   ): void {
     assert(
-      this.endpoints.has(endpointId),
+      this.state.endpointExists(endpointId),
       `Endpoint with id${endpointId} has not been defined`
     );
 
-    const overridesForEndpoint = this.overrides.get(endpointId);
-
     assert(
-      !overridesForEndpoint?.has(overrideId),
+      !this.state.overrideExists(endpointId, overrideId),
       `An override with id ${overrideId} has already been set for endpoint ${endpointId}`
     );
 
-    if (!overridesForEndpoint) {
-      this.overrides.set(
-        endpointId,
-        new Map().set(overrideId, overrideBehaviour)
-      );
-      return;
-    }
-
-    overridesForEndpoint.set(overrideId, overrideBehaviour);
+    this.state.addOverride(endpointId, overrideId, overrideBehaviour);
   }
 
   public activateOverride(
     endpointId: EndpointId,
     overrideId: OverrideId = 'none'
   ): void {
-    this.activeOverrides.set(endpointId, overrideId);
+    this.state.setActiveOverride(endpointId, overrideId);
   }
 
   private initialiseMiddleWare(): void {
@@ -129,11 +115,7 @@ export class Stubsy {
     });
 
     this.app.get('/Stubsy/Config', (req, res, next) => {
-      const response: ConfigResponseEntry[] = generateUiConfigResponse(
-        this.endpoints,
-        this.overrides,
-        this.activeOverrides
-      );
+      const response: ConfigResponseEntry[] = generateUiConfigResponse();
 
       res.send(response);
     });

@@ -9,7 +9,11 @@ import type {
   StubsyActiveOverrides,
   OverrideBehaviour,
   EndpointBehaviour,
+  Endpoint,
 } from '../types';
+import { StubsyState } from '../state';
+
+jest.mock('../state/state');
 
 describe(`Stubsy Utility functions`, () => {
   beforeEach(() => {
@@ -33,10 +37,12 @@ describe(`Stubsy Utility functions`, () => {
   });
 
   describe(`generateUiConfigResponse`, () => {
-    const emptyMap = new Map();
+    it(`should return an empty response if there are no endpoints`, () => {
+      (StubsyState.getInstance as jest.Mock).mockReturnValueOnce({
+        endpoints: new Map(),
+      });
 
-    it(`should return an empty response if there are not endpoints`, () => {
-      const response = generateUiConfigResponse(emptyMap, emptyMap, emptyMap);
+      const response = generateUiConfigResponse();
 
       expect(response).toEqual([]);
     });
@@ -99,9 +105,13 @@ describe(`Stubsy Utility functions`, () => {
         .set(endpoint1Id, override1Id1)
         .set(endpoint3Id, override3Behaviour1);
 
-      expect(
-        generateUiConfigResponse(endpoints, overrides, activeOverrides)
-      ).toMatchSnapshot();
+      (StubsyState.getInstance as jest.Mock).mockReturnValueOnce({
+        endpoints,
+        overrides,
+        activeOverrides,
+      });
+
+      expect(generateUiConfigResponse()).toMatchSnapshot();
     });
   });
 
@@ -110,45 +120,31 @@ describe(`Stubsy Utility functions`, () => {
       send: jest.fn(),
       status: jest.fn(),
     };
-    const defaultStatus: EndpointBehaviour['status'] = 200;
-    const defaultResponseBody: EndpointBehaviour['responseBody'] = [
+    const endpointId = 'books';
+    const status: EndpointBehaviour['status'] = 200;
+    const responseBody: EndpointBehaviour['responseBody'] = [
       'book 1',
       'book 2',
     ];
-    const endpointId = 'books';
-    const activeOverrides: StubsyActiveOverrides = new Map<string, string>();
-    const overrides: StubsyOverrides = new Map();
-
-    beforeEach(() => {
-      overrides.clear();
-      activeOverrides.clear();
-    });
+    const endpoint: Endpoint = { endpointId, responseBody, status } as any;
 
     it(`should return the default endpoint behaviour if it has not got an active override`, () => {
-      const endpointCallback = generateEndpointCallback({
-        defaultStatus,
-        defaultResponseBody,
-        activeOverrides,
-        overrides,
-        endpointId,
-      }) as any;
+      const endpointCallback = generateEndpointCallback(endpoint) as any;
 
       endpointCallback(undefined, responseMock, undefined);
 
-      expect(responseMock.status).toHaveBeenCalledWith(defaultStatus);
-      expect(responseMock.send).toHaveBeenCalledWith(defaultResponseBody);
+      expect(responseMock.status).toHaveBeenCalledWith(status);
+      expect(responseMock.send).toHaveBeenCalledWith(responseBody);
     });
 
     it(`should return an error response if the overrideId has no set behaviour`, () => {
-      const overrideId = 'books-400';
-      activeOverrides.set(endpointId, overrideId);
-      const endpointCallback = generateEndpointCallback({
-        defaultStatus,
-        defaultResponseBody,
-        activeOverrides,
-        overrides,
-        endpointId,
-      }) as any;
+      (
+        StubsyState.getInstance().getActiveOverrideId as jest.Mock
+      ).mockReturnValueOnce('active-override-id');
+      (
+        StubsyState.getInstance().getActiveOverrideBehaviour as jest.Mock
+      ).mockReturnValueOnce(undefined);
+      const endpointCallback = generateEndpointCallback(endpoint) as any;
 
       endpointCallback(undefined, responseMock, undefined);
 
@@ -164,16 +160,14 @@ describe(`Stubsy Utility functions`, () => {
         status: 404,
         responseBody: { message: 'resource not found' },
       };
-      activeOverrides.set(endpointId, overrideId);
-      overrides.set(endpointId, new Map().set(overrideId, overrideBehaviour));
+      (
+        StubsyState.getInstance().getActiveOverrideId as jest.Mock
+      ).mockReturnValueOnce(overrideId);
+      (
+        StubsyState.getInstance().getActiveOverrideBehaviour as jest.Mock
+      ).mockReturnValueOnce(overrideBehaviour);
 
-      const endpointCallback = generateEndpointCallback({
-        defaultStatus,
-        defaultResponseBody,
-        activeOverrides,
-        overrides,
-        endpointId,
-      }) as any;
+      const endpointCallback = generateEndpointCallback(endpoint) as any;
 
       endpointCallback(undefined, responseMock, undefined);
 

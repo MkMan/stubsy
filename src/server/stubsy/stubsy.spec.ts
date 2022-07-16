@@ -7,6 +7,9 @@ import * as stubsyUtilities from '../utility/utility';
 import path from 'path';
 import { Stubsy } from './stubsy';
 import type { EndpointBehaviour, OverrideBehaviour } from '../types';
+import { StubsyState } from '../state';
+
+jest.mock('../state/state');
 
 describe(`Stubsy`, () => {
   const portNumber = 0;
@@ -105,11 +108,7 @@ describe(`Stubsy`, () => {
         '/Stubsy/Config',
         expect.any(Function)
       );
-      expect(stubsyUtilities.generateUiConfigResponse).toHaveBeenCalledWith(
-        stubsyInstance.endpoints,
-        stubsyInstance.overrides,
-        stubsyInstance.activeOverrides
-      );
+      expect(stubsyUtilities.generateUiConfigResponse).toHaveBeenCalled();
       expect(responseMock.send).toHaveBeenCalledWith(mockUiResponse);
     });
   });
@@ -153,21 +152,24 @@ describe(`Stubsy`, () => {
     };
 
     beforeEach(() => {
-      stubsyInstance = new Stubsy(portNumber);
+      stubsyInstance = new Stubsy();
     });
 
     it(`should throw an error if the endpointId already exists`, () => {
-      stubsyInstance.endpoints.set(endpointId, endpointBehaviour);
+      (
+        StubsyState.getInstance().endpointExists as jest.Mock
+      ).mockReturnValueOnce(true);
 
       expect(() => {
         stubsyInstance.registerEndpoint(endpointId, endpointBehaviour);
       }).toThrow(`Endpoint with id ${endpointId} has already been defined`);
     });
 
-    it(`should add the endpoint to the instance if the endpointId is not defined`, () => {
+    it(`should add the endpoint to the state if the endpointId is not defined`, () => {
       stubsyInstance.registerEndpoint(endpointId, endpointBehaviour);
 
-      expect(stubsyInstance.endpoints.get(endpointId)).toEqual(
+      expect(StubsyState.getInstance().addEndpoint).toHaveBeenCalledWith(
+        endpointId,
         endpointBehaviour
       );
     });
@@ -192,6 +194,9 @@ describe(`Stubsy`, () => {
 
     it(`should throw an error if the specified endpoint doesn't exist`, () => {
       const endpointId = 'undefinedEndpoint';
+      (
+        StubsyState.getInstance().endpointExists as jest.Mock
+      ).mockReturnValueOnce(false);
 
       expect(() => {
         stubsyInstance.registerOverride(
@@ -202,31 +207,6 @@ describe(`Stubsy`, () => {
       }).toThrow(`Endpoint with id${endpointId} has not been defined`);
     });
 
-    it(`should initialise the endpoint's override Map if it doesn't exit`, () => {
-      const endpointId = 'movies';
-      const overrideId = '404';
-      const overrideBehaviour: OverrideBehaviour = {
-        status: 404,
-        responseBody: {},
-      };
-      const numberOfOverridesBefore = stubsyInstance.overrides.size;
-
-      stubsyInstance.endpoints.set(endpointId, undefined);
-
-      stubsyInstance.registerOverride(
-        endpointId,
-        overrideId,
-        overrideBehaviour
-      );
-
-      expect(stubsyInstance.overrides.size).toEqual(
-        numberOfOverridesBefore + 1
-      );
-      expect(stubsyInstance.overrides.get(endpointId).get(overrideId)).toBe(
-        overrideBehaviour
-      );
-    });
-
     it(`should throw an error if an override with the same id has already been set`, () => {
       const endpointId = 'movies';
       const overrideId = '404';
@@ -234,13 +214,12 @@ describe(`Stubsy`, () => {
         status: 404,
         responseBody: {},
       };
-
-      stubsyInstance.endpoints.set(endpointId, undefined);
-      stubsyInstance.registerOverride(
-        endpointId,
-        overrideId,
-        overrideBehaviour
-      );
+      (
+        StubsyState.getInstance().endpointExists as jest.Mock
+      ).mockReturnValueOnce(true);
+      (
+        StubsyState.getInstance().overrideExists as jest.Mock
+      ).mockReturnValueOnce(true);
 
       expect(() => {
         stubsyInstance.registerOverride(
@@ -255,30 +234,29 @@ describe(`Stubsy`, () => {
 
     it(`should add the specified override to the previous overrides for the endpoint`, () => {
       const endpointId = 'movies';
-      const override1Id = '404';
-      const override2Id = '500';
-      const override1Behaviour: OverrideBehaviour = {
+      const overrideId = '404';
+      const overrideBehaviour: OverrideBehaviour = {
         status: 404,
         responseBody: {},
       };
-      const override2Behaviour: OverrideBehaviour = {
-        status: 500,
-        responseBody: {},
-      };
+      (
+        StubsyState.getInstance().endpointExists as jest.Mock
+      ).mockReturnValueOnce(true);
+      (
+        StubsyState.getInstance().overrideExists as jest.Mock
+      ).mockReturnValueOnce(false);
 
-      stubsyInstance.endpoints.set(endpointId, undefined);
       stubsyInstance.registerOverride(
         endpointId,
-        override1Id,
-        override1Behaviour
-      );
-      stubsyInstance.registerOverride(
-        endpointId,
-        override2Id,
-        override2Behaviour
+        overrideId,
+        overrideBehaviour
       );
 
-      expect(stubsyInstance.overrides.get(endpointId).size).toEqual(2);
+      expect(StubsyState.getInstance().addOverride).toHaveBeenCalledWith(
+        endpointId,
+        overrideId,
+        overrideBehaviour
+      );
     });
   });
 
@@ -287,13 +265,14 @@ describe(`Stubsy`, () => {
     const overrideId = 'override';
 
     beforeEach(() => {
-      stubsyInstance = new Stubsy(portNumber);
+      stubsyInstance = new Stubsy();
     });
 
     it(`should set the active overrides when the override id is specified`, () => {
       stubsyInstance.activateOverride(endpointId, overrideId);
 
-      expect(stubsyInstance.activeOverrides.get(endpointId)).toEqual(
+      expect(StubsyState.getInstance().setActiveOverride).toHaveBeenCalledWith(
+        endpointId,
         overrideId
       );
     });
@@ -301,7 +280,10 @@ describe(`Stubsy`, () => {
     it(`should set the active overrides when the override id is omitted`, () => {
       stubsyInstance.activateOverride(endpointId);
 
-      expect(stubsyInstance.activeOverrides.get(endpointId)).toEqual('none');
+      expect(StubsyState.getInstance().setActiveOverride).toHaveBeenCalledWith(
+        endpointId,
+        'none'
+      );
     });
   });
 });
