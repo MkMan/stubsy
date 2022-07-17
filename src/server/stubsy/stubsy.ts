@@ -103,7 +103,7 @@ export class Stubsy {
   }
 
   private initialiseUiRoute(): void {
-    this.app.use('/Stubsy', express.static(path.resolve(__dirname, '../ui/')));
+    this.app.use('/Stubsy', express.static(path.resolve(__dirname, './ui/')));
   }
 
   private initialiseConfigRoute(): void {

@@ -16,4 +16,5 @@ const App: FC = () => (
     <Endpoints />
   </Container>
 );
+
 ReactDom.render(<App />, document.getElementById('app-root'));
