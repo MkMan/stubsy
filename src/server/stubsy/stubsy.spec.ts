@@ -69,7 +69,7 @@ describe(`Stubsy`, () => {
 
     it(`should initialise the UI route`, () => {
       expect(mockExpressStatic).toHaveBeenCalledWith(
-        path.resolve(__dirname, '../ui/')
+        path.resolve(__dirname, './ui/')
       );
       expect(stubsyInstance.app.use).toHaveBeenCalledWith(
         '/Stubsy',
