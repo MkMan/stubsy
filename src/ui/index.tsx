@@ -1,7 +1,7 @@
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import React, { FC } from 'react';
-import ReactDom from 'react-dom';
+import { createRoot } from 'react-dom/client';
 
 import { Endpoints } from './endpoints';
 
@@ -18,4 +18,5 @@ const App: FC = () => (
   </Container>
 );
 
-ReactDom.render(<App />, document.getElementById('app-root'));
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+createRoot(document.getElementById('app-root')!).render(<App />);
