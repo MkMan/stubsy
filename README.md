@@ -37,6 +37,7 @@ type EndpointBehaviour = {
   responseBody: unknown;
   status: number;
   type: 'get' | 'post' | 'put' | 'delete' | 'patch';
+  delay?: number;
 };
 ```
 
@@ -53,6 +54,7 @@ response. The override behaviour is defined as follows. The `path` and
 type OverrideBehaviour = {
   responseBody: unknown;
   status: number;
+  delay?: number;
 };
 ```
 

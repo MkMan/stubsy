@@ -1,8 +1,12 @@
-import esbuild from 'esbuild';
+import esbuild, { WatchMode } from 'esbuild';
 import * as fs from 'fs';
 
 const args = process.argv.slice(2);
 const isWatchMode = args.includes('watch');
+
+const getWatchMode = (buildName: string): WatchMode => ({
+  onRebuild: () => console.log(`Rebuilding ${buildName}`),
+});
 
 const uiBuild = esbuild.build({
   entryPoints: ['./src/ui/index.tsx'],
@@ -10,7 +14,7 @@ const uiBuild = esbuild.build({
   outfile: 'dist/ui/index.js',
   target: 'es2016',
   minify: true,
-  watch: isWatchMode,
+  watch: isWatchMode && getWatchMode('UI'),
 });
 const serverBuild = esbuild.build({
   entryPoints: ['./src/server/index.ts'],
@@ -20,7 +24,7 @@ const serverBuild = esbuild.build({
   external: ['body-parser', 'express'],
   target: 'es6',
   minify: true,
-  watch: isWatchMode,
+  watch: isWatchMode && getWatchMode('Server'),
 });
 
 Promise.all([uiBuild, serverBuild]).then(() => {
