@@ -1,17 +1,17 @@
-import {
-  assert,
-  generateUiConfigResponse,
-  generateEndpointCallback,
-} from './utility';
+import { StubsyState } from '../state';
 import type {
+  Endpoint,
+  EndpointBehaviour,
+  OverrideBehaviour,
+  StubsyActiveOverrides,
   StubsyEndpoints,
   StubsyOverrides,
-  StubsyActiveOverrides,
-  OverrideBehaviour,
-  EndpointBehaviour,
-  Endpoint,
 } from '../types';
-import { StubsyState } from '../state';
+import {
+  assert,
+  generateEndpointCallback,
+  generateUiConfigResponse,
+} from './utility';
 
 jest.mock('../state/state');
 

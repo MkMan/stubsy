@@ -18,11 +18,13 @@ module.exports = {
     ecmaVersion: 12,
     sourceType: 'module',
   },
-  plugins: ['react', '@typescript-eslint'],
+  plugins: ['react', '@typescript-eslint', 'simple-import-sort'],
   rules: {
     'no-unused-vars': 'off',
     'react/prop-types': 'off',
     '@typescript-eslint/no-unused-vars': ['error', { args: 'none' }],
+    'simple-import-sort/imports': 'error',
+    'simple-import-sort/exports': 'error',
   },
   settings: {
     react: {

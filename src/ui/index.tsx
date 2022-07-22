@@ -1,7 +1,8 @@
+import Container from '@mui/material/Container';
+import Typography from '@mui/material/Typography';
 import React, { FC } from 'react';
 import ReactDom from 'react-dom';
-import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
+
 import { Endpoints } from './endpoints';
 
 const Logo: FC = () => (

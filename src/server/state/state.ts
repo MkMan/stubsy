@@ -1,9 +1,9 @@
 import {
+  EndpointBehaviour,
+  OverrideBehaviour,
+  StubsyActiveOverrides,
   StubsyEndpoints,
   StubsyOverrides,
-  StubsyActiveOverrides,
-  OverrideBehaviour,
-  EndpointBehaviour,
 } from '../types';
 
 /** A container class for the server state with utility functions */
