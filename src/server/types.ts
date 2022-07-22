@@ -6,6 +6,7 @@ export type EndpointBehaviour = {
   responseBody: unknown;
   status: number;
   type: 'get' | 'post' | 'put' | 'delete' | 'patch';
+  delay?: number;
 };
 export type Endpoint = {
   endpointId: EndpointId;
@@ -13,7 +14,7 @@ export type Endpoint = {
 
 export type OverrideBehaviour = Pick<
   EndpointBehaviour,
-  'status' | 'responseBody'
+  'status' | 'responseBody' | 'delay'
 >;
 export type Override = {
   overrideId: OverrideId;

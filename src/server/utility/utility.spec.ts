@@ -126,12 +126,34 @@ describe(`Stubsy Utility functions`, () => {
       'book 1',
       'book 2',
     ];
-    const endpoint: Endpoint = { endpointId, responseBody, status } as any;
+    const endpoint: Endpoint = { endpointId, responseBody, status } as Endpoint;
 
     it(`should return the default endpoint behaviour if it has not got an active override`, () => {
-      const endpointCallback = generateEndpointCallback(endpoint) as any;
+      jest.useFakeTimers();
+      const endpointCallback = generateEndpointCallback(endpoint);
 
-      endpointCallback(undefined, responseMock, undefined);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      endpointCallback(undefined as any, responseMock as any, undefined as any);
+      jest.advanceTimersByTime(0);
+
+      expect(responseMock.status).toHaveBeenCalledWith(status);
+      expect(responseMock.send).toHaveBeenCalledWith(responseBody);
+    });
+
+    it(`should correctly handle a delay in the default endpoint behaviour`, () => {
+      jest.useFakeTimers();
+      const endpointCallback = generateEndpointCallback({
+        ...endpoint,
+        delay: 1000,
+      });
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      endpointCallback(undefined as any, responseMock as any, undefined as any);
+
+      expect(responseMock.status).not.toHaveBeenCalled();
+      expect(responseMock.send).not.toHaveBeenCalled();
+
+      jest.advanceTimersByTime(1000);
 
       expect(responseMock.status).toHaveBeenCalledWith(status);
       expect(responseMock.send).toHaveBeenCalledWith(responseBody);
@@ -144,9 +166,10 @@ describe(`Stubsy Utility functions`, () => {
       (
         StubsyState.getInstance().getActiveOverrideBehaviour as jest.Mock
       ).mockReturnValueOnce(undefined);
-      const endpointCallback = generateEndpointCallback(endpoint) as any;
+      const endpointCallback = generateEndpointCallback(endpoint);
 
-      endpointCallback(undefined, responseMock, undefined);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      endpointCallback(undefined as any, responseMock as any, undefined as any);
 
       expect(responseMock.status).toHaveBeenCalledWith(500);
       expect(responseMock.send).toHaveBeenCalledWith({
@@ -155,6 +178,7 @@ describe(`Stubsy Utility functions`, () => {
     });
 
     it(`should return the override behaviour if it is set`, () => {
+      jest.useFakeTimers();
       const overrideId = 'overrideId';
       const overrideBehaviour: OverrideBehaviour = {
         status: 404,
@@ -167,9 +191,44 @@ describe(`Stubsy Utility functions`, () => {
         StubsyState.getInstance().getActiveOverrideBehaviour as jest.Mock
       ).mockReturnValueOnce(overrideBehaviour);
 
-      const endpointCallback = generateEndpointCallback(endpoint) as any;
+      const endpointCallback = generateEndpointCallback(endpoint);
 
-      endpointCallback(undefined, responseMock, undefined);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      endpointCallback(undefined as any, responseMock as any, undefined as any);
+      jest.advanceTimersByTime(0);
+
+      expect(responseMock.status).toHaveBeenCalledWith(
+        overrideBehaviour.status
+      );
+      expect(responseMock.send).toHaveBeenCalledWith(
+        overrideBehaviour.responseBody
+      );
+    });
+
+    it(`should return the override behaviour if it is set`, () => {
+      jest.useFakeTimers();
+      const overrideId = 'overrideId';
+      const overrideBehaviour: OverrideBehaviour = {
+        status: 404,
+        responseBody: { message: 'resource not found' },
+        delay: 1000,
+      };
+      (
+        StubsyState.getInstance().getActiveOverrideId as jest.Mock
+      ).mockReturnValueOnce(overrideId);
+      (
+        StubsyState.getInstance().getActiveOverrideBehaviour as jest.Mock
+      ).mockReturnValueOnce(overrideBehaviour);
+
+      const endpointCallback = generateEndpointCallback(endpoint);
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      endpointCallback(undefined as any, responseMock as any, undefined as any);
+
+      expect(responseMock.status).not.toHaveBeenCalled();
+      expect(responseMock.send).not.toHaveBeenCalled();
+
+      jest.advanceTimersByTime(1000);
 
       expect(responseMock.status).toHaveBeenCalledWith(
         overrideBehaviour.status

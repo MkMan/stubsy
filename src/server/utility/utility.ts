@@ -43,14 +43,17 @@ export const generateEndpointCallback = (
     endpointId,
     status: defaultStatus,
     responseBody: defaultResponseBody,
+    delay: defaultDelay,
   } = endpoint;
 
   const callback: RequestHandler = (req, res, next) => {
     const activeOverrideId = state.getActiveOverrideId(endpointId);
 
     if (activeOverrideId === 'none' || !activeOverrideId) {
-      res.status(defaultStatus);
-      res.send(defaultResponseBody);
+      setTimeout(() => {
+        res.status(defaultStatus);
+        res.send(defaultResponseBody);
+      }, defaultDelay);
       return;
     }
 
@@ -63,9 +66,11 @@ export const generateEndpointCallback = (
       return;
     }
 
-    const { status, responseBody } = activeOverrideBehaviour;
-    res.status(status);
-    res.send(responseBody);
+    const { status, responseBody, delay } = activeOverrideBehaviour;
+    setTimeout(() => {
+      res.status(status);
+      res.send(responseBody);
+    }, delay);
   };
 
   return callback;
