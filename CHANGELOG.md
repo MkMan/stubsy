@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/MkMan/stubsy/compare/v1.2.5...v1.3.0) (2022-07-22)
+
+
+### Features
+
+* implement delayed responses ([1779e6c](https://github.com/MkMan/stubsy/commit/1779e6cd5a7b3cc96c371740ceb565fb1f090e2f))
+
 ## [1.2.5](https://github.com/MkMan/stubsy/compare/v1.2.4...v1.2.5) (2022-06-25)
 
 
