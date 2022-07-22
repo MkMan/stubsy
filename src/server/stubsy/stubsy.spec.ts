@@ -1,13 +1,14 @@
+import path from 'path';
+
+import { json } from '../../../__mocks__/body-parser';
 import mockExpress, {
   mockExpressFunctions,
   mockExpressStatic,
 } from '../../../__mocks__/express';
-import { json } from '../../../__mocks__/body-parser';
-import * as stubsyUtilities from '../utility/utility';
-import path from 'path';
-import { Stubsy } from './stubsy';
-import type { EndpointBehaviour, OverrideBehaviour } from '../types';
 import { StubsyState } from '../state';
+import type { EndpointBehaviour, OverrideBehaviour } from '../types';
+import * as stubsyUtilities from '../utility/utility';
+import { Stubsy } from './stubsy';
 
 jest.mock('../state/state');
 
@@ -23,7 +24,7 @@ describe(`Stubsy`, () => {
     status: jest.fn(),
   };
 
-  let stubsyInstance: any;
+  let stubsyInstance: Stubsy;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -49,6 +50,7 @@ describe(`Stubsy`, () => {
     const mockUiResponse = '2 + 2 = 4';
 
     beforeEach(() => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       generateUiConfigResponseSpy.mockReturnValue(mockUiResponse as any);
 
       stubsyInstance = new Stubsy(portNumber);
@@ -60,7 +62,8 @@ describe(`Stubsy`, () => {
     });
 
     it(`should initialise the portNumber instance variable`, () => {
-      expect(stubsyInstance.portNumber).toEqual(portNumber);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      expect((stubsyInstance as any).portNumber).toEqual(portNumber);
     });
 
     it(`should initialise the json middleware`, () => {
@@ -129,7 +132,8 @@ describe(`Stubsy`, () => {
 
     it(`should start the server on the port number specified`, () => {
       expect(stubsyInstance.app.listen).toHaveBeenCalledWith(
-        stubsyInstance.portNumber
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (stubsyInstance as any).portNumber
       );
     });
 
@@ -202,7 +206,7 @@ describe(`Stubsy`, () => {
         stubsyInstance.registerOverride(
           endpointId,
           'does not matter',
-          undefined
+          undefined as unknown as OverrideBehaviour
         );
       }).toThrow(`Endpoint with id${endpointId} has not been defined`);
     });

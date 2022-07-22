@@ -1,13 +1,9 @@
-import express, { Express } from 'express';
 import { json } from 'body-parser';
+import express, { Express } from 'express';
 import http from 'http';
 import path from 'path';
 
-import {
-  assert,
-  generateEndpointCallback,
-  generateUiConfigResponse,
-} from '../utility';
+import { StubsyState } from '../state';
 import type {
   ConfigPayload,
   ConfigResponseEntry,
@@ -16,8 +12,11 @@ import type {
   OverrideBehaviour,
   OverrideId,
 } from '../types';
-
-import { StubsyState } from '../state';
+import {
+  assert,
+  generateEndpointCallback,
+  generateUiConfigResponse,
+} from '../utility';
 
 export class Stubsy {
   public app: Express;

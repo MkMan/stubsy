@@ -6,7 +6,9 @@ export const mockExpressFunctions = {
 };
 export const mockExpressStatic = jest.fn(() => 'static');
 
-const mockExpress = jest.fn(() => mockExpressFunctions);
-(mockExpress as any).static = mockExpressStatic;
+const mockExpress: jest.Mock & { static?: jest.Mock } = jest.fn(
+  () => mockExpressFunctions
+);
+mockExpress.static = mockExpressStatic;
 
 export default mockExpress;

@@ -1,4 +1,5 @@
 import { RequestHandler } from 'express';
+
 import { StubsyState } from '../state/state';
 import type { ConfigResponseEntry, Endpoint } from '../types';
 
