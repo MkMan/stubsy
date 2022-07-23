@@ -1,16 +1,12 @@
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
-import CardHeader from '@mui/material/CardHeader';
 import Collapse from '@mui/material/Collapse';
 import FormControl from '@mui/material/FormControl';
 import FormControlLabel from '@mui/material/FormControlLabel';
-import IconButton from '@mui/material/IconButton';
 import Radio from '@mui/material/Radio';
 import RadioGroup from '@mui/material/RadioGroup';
 import React, { FC } from 'react';
 
-import type { ConfigResponseEntry as EndpointConfig } from '../server/types';
+import type { ConfigResponseEntry as EndpointConfig } from '../../server/types';
 
 type OnOverrideChange = (value: string) => void;
 
@@ -21,60 +17,7 @@ type OverrideProps = {
   isExpanded: boolean;
 };
 
-export const Endpoint: FC<{ endpointConfig: EndpointConfig }> = ({
-  endpointConfig,
-}) => {
-  const [isExpanded, setIsExpanded] = React.useState(true);
-
-  const { path, type, endpointId, overrides } = endpointConfig;
-  const hasOverrides = overrides.length > 0;
-
-  const handleExpandClick = () => {
-    setIsExpanded(!isExpanded);
-  };
-
-  const onOverrideChange: OnOverrideChange = (overrideId) => {
-    fetch('/Stubsy/Config', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        endpointId,
-        overrideId,
-      }),
-    });
-  };
-
-  return (
-    <Card style={{ marginBottom: '20px' }}>
-      <CardHeader
-        action={
-          hasOverrides ? (
-            <IconButton
-              onClick={handleExpandClick}
-              aria-expanded={isExpanded}
-              aria-label="show more"
-            >
-              <ExpandMoreIcon />
-            </IconButton>
-          ) : null
-        }
-        title={`${type.toUpperCase()} ${path}`}
-      />
-      {hasOverrides && (
-        <Overrides
-          onOverrideChange={onOverrideChange}
-          overrides={overrides}
-          endpointId={endpointId}
-          isExpanded={isExpanded}
-        />
-      )}
-    </Card>
-  );
-};
-
-const Overrides: FC<OverrideProps> = ({
+export const Overrides: FC<OverrideProps> = ({
   overrides,
   endpointId,
   isExpanded,
