@@ -7,13 +7,11 @@ stubsy.registerEndpoint('books', {
   status: 200,
   type: 'get',
   responseBody: [{ title: 'Divine reality' }, { title: 'The sealed nectar' }],
-  delay: 2000,
 });
 
 stubsy.registerOverride('books', 'error', {
   status: 404,
   responseBody: { message: 'resource not found' },
-  delay: 5000,
 });
 stubsy.registerOverride('books', 'outage', {
   status: 500,
