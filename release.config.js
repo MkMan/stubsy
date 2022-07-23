@@ -9,13 +9,13 @@ module.exports = {
         changelogFile: 'CHANGELOG.md',
       },
     ],
+    '@semantic-release/npm',
     [
       '@semantic-release/git',
       {
         message: 'chore(release): releasing ${nextRelease.version} [skip ci]',
       },
     ],
-    '@semantic-release/npm',
     [
       '@semantic-release/github',
       {
