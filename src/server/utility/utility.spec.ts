@@ -13,11 +13,11 @@ import {
   generateUiConfigResponse,
 } from './utility';
 
-jest.mock('../state/state');
+vi.mock('../state/state');
 
 describe(`Stubsy Utility functions`, () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe(`assert`, () => {
@@ -38,7 +38,7 @@ describe(`Stubsy Utility functions`, () => {
 
   describe(`generateUiConfigResponse`, () => {
     it(`should return an empty response if there are no endpoints`, () => {
-      (StubsyState.getInstance as jest.Mock).mockReturnValueOnce({
+      (StubsyState.getInstance as vi.Mock).mockReturnValueOnce({
         endpoints: new Map(),
       });
 
@@ -105,7 +105,7 @@ describe(`Stubsy Utility functions`, () => {
         .set(endpoint1Id, override1Id1)
         .set(endpoint3Id, override3Behaviour1);
 
-      (StubsyState.getInstance as jest.Mock).mockReturnValueOnce({
+      (StubsyState.getInstance as vi.Mock).mockReturnValueOnce({
         endpoints,
         overrides,
         activeOverrides,
@@ -117,8 +117,8 @@ describe(`Stubsy Utility functions`, () => {
 
   describe(`generateEndpointCallback`, () => {
     const responseMock = {
-      send: jest.fn(),
-      status: jest.fn(),
+      send: vi.fn(),
+      status: vi.fn(),
     };
     const endpointId = 'books';
     const status: EndpointBehaviour['status'] = 200;
@@ -129,19 +129,19 @@ describe(`Stubsy Utility functions`, () => {
     const endpoint: Endpoint = { endpointId, responseBody, status } as Endpoint;
 
     it(`should return the default endpoint behaviour if it has not got an active override`, () => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       const endpointCallback = generateEndpointCallback(endpoint);
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       endpointCallback(undefined as any, responseMock as any, undefined as any);
-      jest.advanceTimersByTime(0);
+      vi.advanceTimersByTime(0);
 
       expect(responseMock.status).toHaveBeenCalledWith(status);
       expect(responseMock.send).toHaveBeenCalledWith(responseBody);
     });
 
     it(`should correctly handle a delay in the default endpoint behaviour`, () => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       const endpointCallback = generateEndpointCallback({
         ...endpoint,
         delay: 1000,
@@ -153,7 +153,7 @@ describe(`Stubsy Utility functions`, () => {
       expect(responseMock.status).not.toHaveBeenCalled();
       expect(responseMock.send).not.toHaveBeenCalled();
 
-      jest.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1000);
 
       expect(responseMock.status).toHaveBeenCalledWith(status);
       expect(responseMock.send).toHaveBeenCalledWith(responseBody);
@@ -161,10 +161,10 @@ describe(`Stubsy Utility functions`, () => {
 
     it(`should return an error response if the overrideId has no set behaviour`, () => {
       (
-        StubsyState.getInstance().getActiveOverrideId as jest.Mock
+        StubsyState.getInstance().getActiveOverrideId as vi.Mock
       ).mockReturnValueOnce('active-override-id');
       (
-        StubsyState.getInstance().getActiveOverrideBehaviour as jest.Mock
+        StubsyState.getInstance().getActiveOverrideBehaviour as vi.Mock
       ).mockReturnValueOnce(undefined);
       const endpointCallback = generateEndpointCallback(endpoint);
 
@@ -178,24 +178,24 @@ describe(`Stubsy Utility functions`, () => {
     });
 
     it(`should return the override behaviour if it is set`, () => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       const overrideId = 'overrideId';
       const overrideBehaviour: OverrideBehaviour = {
         status: 404,
         responseBody: { message: 'resource not found' },
       };
       (
-        StubsyState.getInstance().getActiveOverrideId as jest.Mock
+        StubsyState.getInstance().getActiveOverrideId as vi.Mock
       ).mockReturnValueOnce(overrideId);
       (
-        StubsyState.getInstance().getActiveOverrideBehaviour as jest.Mock
+        StubsyState.getInstance().getActiveOverrideBehaviour as vi.Mock
       ).mockReturnValueOnce(overrideBehaviour);
 
       const endpointCallback = generateEndpointCallback(endpoint);
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       endpointCallback(undefined as any, responseMock as any, undefined as any);
-      jest.advanceTimersByTime(0);
+      vi.advanceTimersByTime(0);
 
       expect(responseMock.status).toHaveBeenCalledWith(
         overrideBehaviour.status
@@ -206,7 +206,7 @@ describe(`Stubsy Utility functions`, () => {
     });
 
     it(`should return the override behaviour if it is set`, () => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       const overrideId = 'overrideId';
       const overrideBehaviour: OverrideBehaviour = {
         status: 404,
@@ -214,10 +214,10 @@ describe(`Stubsy Utility functions`, () => {
         delay: 1000,
       };
       (
-        StubsyState.getInstance().getActiveOverrideId as jest.Mock
+        StubsyState.getInstance().getActiveOverrideId as vi.Mock
       ).mockReturnValueOnce(overrideId);
       (
-        StubsyState.getInstance().getActiveOverrideBehaviour as jest.Mock
+        StubsyState.getInstance().getActiveOverrideBehaviour as vi.Mock
       ).mockReturnValueOnce(overrideBehaviour);
 
       const endpointCallback = generateEndpointCallback(endpoint);
@@ -228,7 +228,7 @@ describe(`Stubsy Utility functions`, () => {
       expect(responseMock.status).not.toHaveBeenCalled();
       expect(responseMock.send).not.toHaveBeenCalled();
 
-      jest.advanceTimersByTime(1000);
+      vi.advanceTimersByTime(1000);
 
       expect(responseMock.status).toHaveBeenCalledWith(
         overrideBehaviour.status

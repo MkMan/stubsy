@@ -1,15 +1,15 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1
 
-exports[`Stubsy Utility functions generateUiConfigResponse should return a correctly structured response for the UI 1`] = `
-Array [
-  Object {
+exports[`Stubsy Utility functions > generateUiConfigResponse > should return a correctly structured response for the UI 1`] = `
+[
+  {
     "endpointId": "movies",
-    "overrides": Array [
-      Object {
+    "overrides": [
+      {
         "isActive": true,
         "overrideId": "movies-404",
       },
-      Object {
+      {
         "isActive": false,
         "overrideId": "movies-500",
       },
@@ -17,16 +17,16 @@ Array [
     "path": "/movies",
     "type": "get",
   },
-  Object {
+  {
     "endpointId": "books",
-    "overrides": Array [],
+    "overrides": [],
     "path": "/books",
     "type": "post",
   },
-  Object {
+  {
     "endpointId": "shows",
-    "overrides": Array [
-      Object {
+    "overrides": [
+      {
         "isActive": false,
         "overrideId": "shows-200",
       },

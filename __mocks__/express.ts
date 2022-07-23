@@ -1,14 +1,14 @@
-export const mockExpressFunctions = {
-  use: jest.fn(),
-  get: jest.fn(),
-  post: jest.fn(),
-  listen: jest.fn(),
-};
-export const mockExpressStatic = jest.fn(() => 'static');
+import { Mock } from 'vitest';
 
-const mockExpress: jest.Mock & { static?: jest.Mock } = jest.fn(
-  () => mockExpressFunctions
-);
+export const mockExpressFunctions = {
+  use: vi.fn(),
+  get: vi.fn(),
+  post: vi.fn(),
+  listen: vi.fn(),
+};
+export const mockExpressStatic = vi.fn(() => 'static');
+
+const mockExpress: Mock & { static?: Mock } = vi.fn(() => mockExpressFunctions);
 mockExpress.static = mockExpressStatic;
 
 export default mockExpress;

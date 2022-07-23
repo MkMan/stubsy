@@ -1,14 +1,13 @@
-const setActiveOverrideMock = jest.fn();
-const endpointExistsMock = jest.fn();
-const addEndpointMock = jest.fn();
-const overrideExistsMock = jest.fn();
-const addOverrideMock = jest.fn();
-const getActiveOverrideIdMock = jest.fn();
-const getActiveOverrideBehaviourMock = jest.fn();
+const setActiveOverrideMock = vi.fn();
+const endpointExistsMock = vi.fn();
+const addEndpointMock = vi.fn();
+const overrideExistsMock = vi.fn();
+const addOverrideMock = vi.fn();
+const getActiveOverrideIdMock = vi.fn();
+const getActiveOverrideBehaviourMock = vi.fn();
 
 export const StubsyState = {
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  getInstance: jest.fn(() => {
+  getInstance: vi.fn(() => {
     return {
       setActiveOverride: setActiveOverrideMock,
       endpointExists: endpointExistsMock,

@@ -1,4 +1,5 @@
 import path from 'path';
+import { Mock, SpyInstance } from 'vitest';
 
 import { json } from '../../../__mocks__/body-parser';
 import mockExpress, {
@@ -10,31 +11,33 @@ import type { EndpointBehaviour, OverrideBehaviour } from '../types';
 import * as stubsyUtilities from '../utility/utility';
 import { Stubsy } from './stubsy';
 
-jest.mock('../state/state');
+vi.mock('../state/state');
+vi.mock('express');
+vi.mock('body-parser');
 
 describe(`Stubsy`, () => {
   const portNumber = 0;
 
-  let generateUiConfigResponseSpy: jest.SpyInstance;
-  let consoleLogSpy: jest.SpyInstance;
-  let assertSpy: jest.SpyInstance;
-  let generateEndpointCallbackSpy: jest.SpyInstance;
+  let generateUiConfigResponseSpy: SpyInstance;
+  let consoleLogSpy: SpyInstance;
+  let assertSpy: SpyInstance;
+  let generateEndpointCallbackSpy: SpyInstance;
   const responseMock = {
-    send: jest.fn(),
-    status: jest.fn(),
+    send: vi.fn(),
+    status: vi.fn(),
   };
 
   let stubsyInstance: Stubsy;
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    generateUiConfigResponseSpy = jest.spyOn(
+    vi.clearAllMocks();
+    generateUiConfigResponseSpy = vi.spyOn(
       stubsyUtilities,
       'generateUiConfigResponse'
     );
-    consoleLogSpy = jest.spyOn(console, 'log');
-    assertSpy = jest.spyOn(stubsyUtilities, 'assert');
-    generateEndpointCallbackSpy = jest.spyOn(
+    consoleLogSpy = vi.spyOn(console, 'log');
+    assertSpy = vi.spyOn(stubsyUtilities, 'assert');
+    generateEndpointCallbackSpy = vi.spyOn(
       stubsyUtilities,
       'generateEndpointCallback'
     );
@@ -76,7 +79,7 @@ describe(`Stubsy`, () => {
       );
       expect(stubsyInstance.app.use).toHaveBeenCalledWith(
         '/Stubsy',
-        mockExpressStatic.getMockImplementation()?.()
+        mockExpressStatic()
       );
     });
 
@@ -87,11 +90,11 @@ describe(`Stubsy`, () => {
           overrideId: 'overrideId',
         },
       };
-      jest.spyOn(stubsyInstance, 'activateOverride');
-      const postConfigCallback = (stubsyInstance.app.post as jest.Mock).mock
+      vi.spyOn(stubsyInstance, 'activateOverride');
+      const postConfigCallback = (stubsyInstance.app.post as Mock).mock
         .calls[0][1];
       postConfigCallback(requestMock, responseMock);
-      const getConfigCallback = (stubsyInstance.app.get as jest.Mock).mock
+      const getConfigCallback = (stubsyInstance.app.get as Mock).mock
         .calls[0][1];
 
       postConfigCallback(requestMock, responseMock);
@@ -160,9 +163,9 @@ describe(`Stubsy`, () => {
     });
 
     it(`should throw an error if the endpointId already exists`, () => {
-      (
-        StubsyState.getInstance().endpointExists as jest.Mock
-      ).mockReturnValueOnce(true);
+      (StubsyState.getInstance().endpointExists as Mock).mockReturnValueOnce(
+        true
+      );
 
       expect(() => {
         stubsyInstance.registerEndpoint(endpointId, endpointBehaviour);
@@ -198,9 +201,9 @@ describe(`Stubsy`, () => {
 
     it(`should throw an error if the specified endpoint doesn't exist`, () => {
       const endpointId = 'undefinedEndpoint';
-      (
-        StubsyState.getInstance().endpointExists as jest.Mock
-      ).mockReturnValueOnce(false);
+      (StubsyState.getInstance().endpointExists as Mock).mockReturnValueOnce(
+        false
+      );
 
       expect(() => {
         stubsyInstance.registerOverride(
@@ -218,12 +221,12 @@ describe(`Stubsy`, () => {
         status: 404,
         responseBody: {},
       };
-      (
-        StubsyState.getInstance().endpointExists as jest.Mock
-      ).mockReturnValueOnce(true);
-      (
-        StubsyState.getInstance().overrideExists as jest.Mock
-      ).mockReturnValueOnce(true);
+      (StubsyState.getInstance().endpointExists as Mock).mockReturnValueOnce(
+        true
+      );
+      (StubsyState.getInstance().overrideExists as Mock).mockReturnValueOnce(
+        true
+      );
 
       expect(() => {
         stubsyInstance.registerOverride(
@@ -243,12 +246,12 @@ describe(`Stubsy`, () => {
         status: 404,
         responseBody: {},
       };
-      (
-        StubsyState.getInstance().endpointExists as jest.Mock
-      ).mockReturnValueOnce(true);
-      (
-        StubsyState.getInstance().overrideExists as jest.Mock
-      ).mockReturnValueOnce(false);
+      (StubsyState.getInstance().endpointExists as Mock).mockReturnValueOnce(
+        true
+      );
+      (StubsyState.getInstance().overrideExists as Mock).mockReturnValueOnce(
+        false
+      );
 
       stubsyInstance.registerOverride(
         endpointId,

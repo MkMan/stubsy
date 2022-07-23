@@ -1,1 +1,1 @@
-export const json = jest.fn();
+export const json = vi.fn();
