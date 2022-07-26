@@ -9,8 +9,8 @@ export const Endpoints: FC<{ serverConfig: ConfigResponseEntry[] }> = ({
   <>
     {serverConfig.map((endpointConfig) => (
       <Endpoint
-        key={endpointConfig.endpointId}
         endpointConfig={endpointConfig}
+        key={endpointConfig.endpointId}
       />
     ))}
   </>
