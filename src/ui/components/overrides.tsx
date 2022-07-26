@@ -40,23 +40,23 @@ export const Overrides: FC<OverrideProps> = ({
           <RadioGroup
             aria-label="endpoints overrides"
             name={endpointId}
-            value={value}
             onChange={handleOverrideChange}
+            value={value}
           >
             <FormControlLabel
-              value="none"
               control={<Radio />}
-              label="Default"
               data-testid="default"
+              label="Default"
+              value="none"
             />
             {overrides.map(
               ({ overrideId }) => (
                 <FormControlLabel
-                  key={overrideId}
-                  value={overrideId}
                   control={<Radio />}
                   data-testid={overrideId}
+                  key={overrideId}
                   label={overrideId}
+                  value={overrideId}
                 />
               ),
             )}

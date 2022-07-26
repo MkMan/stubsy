@@ -33,6 +33,7 @@ module.exports = {
     '@typescript-eslint/no-unused-vars': ['error', { args: 'none' }],
     'simple-import-sort/imports': 'error',
     'simple-import-sort/exports': 'error',
+    'react/jsx-sort-props': 'error',
   },
   settings: {
     react: {
