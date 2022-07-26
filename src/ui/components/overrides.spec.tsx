@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { ConfigResponseEntry as EndpointConfig } from '../../server/types';
-import { act,render, screen } from '../test-utils';
+import { act, render, screen } from '../test-utils';
 import { Overrides } from './overrides';
 
 describe(`Overrides`, () => {
@@ -38,6 +38,7 @@ describe(`Overrides`, () => {
 
     const defaultBehaviour = screen.getByRole('radio', { name: 'Default' });
 
+    // prettier-ignore -- causes failure in CI
     expect(defaultBehaviour).toBeChecked();
   });
 
@@ -50,6 +51,7 @@ describe(`Overrides`, () => {
 
     const activeOverride = screen.getByRole('radio', { name: '500' });
 
+    // prettier-ignore -- causes failure in CI
     expect(activeOverride).toBeChecked();
   });
 
