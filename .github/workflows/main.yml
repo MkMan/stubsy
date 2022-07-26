@@ -31,13 +31,19 @@ jobs:
         run: |
           echo "::set-output name=pnpm_cache_dir::$(pnpm store path)"
 
+      # - uses: actions/cache@v3
+      #   name: Setup pnpm cache
+      #   with:
+      #     path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
+      #     key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+      #     restore-keys: ${{ runner.os }}-pnpm-store-
+
       - uses: actions/cache@v3
-        name: Setup pnpm cache
+        name: Setup Cypress cache
         with:
-          path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+          path: ~/.cache/Cypress
+          key: cypress-cache-binary-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: cypress-cache-binary
 
       - name: Install Dependencies
         run: pnpm install
