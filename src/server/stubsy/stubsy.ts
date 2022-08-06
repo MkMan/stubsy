@@ -42,21 +42,23 @@ export class Stubsy {
   public start(): http.Server {
     assert(
       typeof this.portNumber !== 'undefined',
-      'portNumber not specified in the constructor'
+      'portNumber not specified in the constructor',
     );
     console.log(
-      `Stubsy is now listening on port ${this.portNumber}\nThe Stubsy UI can be accessed on http://localhost:${this.portNumber}/Stubsy`
+      `Stubsy is now listening on port ${this
+        .portNumber}\nThe Stubsy UI can be accessed on http://localhost:${this
+        .portNumber}/Stubsy`,
     );
     return this.app.listen(this.portNumber);
   }
 
   public registerEndpoint(
     endpointId: EndpointId,
-    endpointBehaviour: EndpointBehaviour
+    endpointBehaviour: EndpointBehaviour,
   ): void {
     assert(
       !this.state.endpointExists(endpointId),
-      `Endpoint with id ${endpointId} has already been defined`
+      `Endpoint with id ${endpointId} has already been defined`,
     );
 
     this.state.addEndpoint(endpointId, endpointBehaviour);
@@ -68,23 +70,23 @@ export class Stubsy {
       generateEndpointCallback({
         ...endpointBehaviour,
         endpointId,
-      })
+      }),
     );
   }
 
   public registerOverride(
     endpointId: EndpointId,
     overrideId: OverrideId,
-    overrideBehaviour: OverrideBehaviour
+    overrideBehaviour: OverrideBehaviour,
   ): void {
     assert(
       this.state.endpointExists(endpointId),
-      `Endpoint with id${endpointId} has not been defined`
+      `Endpoint with id${endpointId} has not been defined`,
     );
 
     assert(
       !this.state.overrideExists(endpointId, overrideId),
-      `An override with id ${overrideId} has already been set for endpoint ${endpointId}`
+      `An override with id ${overrideId} has already been set for endpoint ${endpointId}`,
     );
 
     this.state.addOverride(endpointId, overrideId, overrideBehaviour);
@@ -92,7 +94,7 @@ export class Stubsy {
 
   public activateOverride(
     endpointId: EndpointId,
-    overrideId: OverrideId = 'none'
+    overrideId: OverrideId = 'none',
   ): void {
     this.state.setActiveOverride(endpointId, overrideId);
   }

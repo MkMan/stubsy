@@ -36,10 +36,10 @@ specifiers:
   markdownlint: 0.26.0
   markdownlint-cli: 0.32.0
   nodemon: 2.0.19
-  prettier: 2.7.1
   react: 18.2.0
   react-dom: 18.2.0
   rimraf: 3.0.2
+  rome: 0.8.0-next.ff4153b
   semantic-release: 19.0.3
   ts-node: 10.9.1
   typescript: 4.7.4
@@ -85,10 +85,10 @@ devDependencies:
   markdownlint: 0.26.0
   markdownlint-cli: 0.32.0
   nodemon: 2.0.19
-  prettier: 2.7.1
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0
   rimraf: 3.0.2
+  rome: 0.8.0-next.ff4153b
   semantic-release: 19.0.3
   ts-node: 10.9.1_uax2vy4iib52l7davxxtv3qgz4
   typescript: 4.7.4
@@ -885,6 +885,54 @@ packages:
   /@popperjs/core/2.11.5:
     resolution: {integrity: sha512-9X2obfABZuDVLCgPK9aX0a/x4jaOEweTTWE2+9sr0Qqqevj2Uv5XorvusThmc9XGYpS9yI+fhh8RTafBtGposw==}
     dev: true
+
+  /@rometools/cli-darwin-arm64/0.8.0-next.ff4153b:
+    resolution: {integrity: sha512-P0BCJyN50Go7U5AG2Ujh8rIwmnaGpOqYqpsmF2J9hRX8zdMiIpYdbmAG6q0B6kibmwYcwS0+JgIdrYn4bl9Hpg==}
+    cpu: [arm64]
+    os: [darwin]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@rometools/cli-darwin-x64/0.8.0-next.ff4153b:
+    resolution: {integrity: sha512-d9PuyMo4Nc16/YrWaskU+2mygYK1+Vg5GjHJswX51fkUsNlVbNFqDtYLce6m1Oe7UAh0GcsViOvF3jw7fDncbQ==}
+    cpu: [x64]
+    os: [darwin]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@rometools/cli-linux-arm64/0.8.0-next.ff4153b:
+    resolution: {integrity: sha512-evoUPlk5t6LshpGA9bLB1+42sakKZspyAOJP5P5Fp9HQc9Lvg7c3H5dSosSPSsKK3EVk9ClNVNJq9XMKS5qABQ==}
+    cpu: [arm64]
+    os: [linux]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@rometools/cli-linux-x64/0.8.0-next.ff4153b:
+    resolution: {integrity: sha512-vjMS1l32GC1YZC0ed9Ryr85IDYWKb4gcLgLaGTiaGEgB8tjlWAvB4h8IdomT8bJYSYjgdZOHuV5lTJ5pI2VfKg==}
+    cpu: [x64]
+    os: [linux]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@rometools/cli-win32-arm64/0.8.0-next.ff4153b:
+    resolution: {integrity: sha512-W5sUoDXuE7+bK/hNtafctYT+lfxlLacqeGsw7apFczXa8c7H+SrcHneveTwzl0iUxY2R+XY9wUe4aDa+v+zYlw==}
+    cpu: [arm64]
+    os: [win32]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /@rometools/cli-win32-x64/0.8.0-next.ff4153b:
+    resolution: {integrity: sha512-zpEhtqM5K3WfxDv2/bgyXOU6R33lfwuDbehM7eMsaRgwMIA7vbLenxX7Y/hpgPqhZ2MpodJhFLuK8m9yIQ7Rxw==}
+    cpu: [x64]
+    os: [win32]
+    requiresBuild: true
+    dev: true
+    optional: true
 
   /@semantic-release/changelog/6.0.1_semantic-release@19.0.3:
     resolution: {integrity: sha512-FT+tAGdWHr0RCM3EpWegWnvXJ05LQtBkQUaQRIExONoXjVjLuOILNm4DEKNaV+GAQyJjbLRVs57ti//GypH6PA==}
@@ -5138,12 +5186,6 @@ packages:
     engines: {node: '>= 0.8.0'}
     dev: true
 
-  /prettier/2.7.1:
-    resolution: {integrity: sha512-ujppO+MkdPqoVINuDFDRLClm7D78qbDt0/NR+wp5FqEZOoTNAjPHWj17QRhu7geIHJfcNhRk1XVQmF8Bp3ye+g==}
-    engines: {node: '>=10.13.0'}
-    hasBin: true
-    dev: true
-
   /pretty-bytes/5.6.0:
     resolution: {integrity: sha512-FFw039TmrBqFK8ma/7OL3sDz/VytdtJr044/QUJtH0wK9lb9jLq9tJyIxUwtQJHwar2BqtiA4iCWSwo9JLkzFg==}
     engines: {node: '>=6'}
@@ -5493,6 +5535,20 @@ packages:
     hasBin: true
     optionalDependencies:
       fsevents: 2.3.2
+    dev: true
+
+  /rome/0.8.0-next.ff4153b:
+    resolution: {integrity: sha512-Hf1gx01l+6JRRKK4XSThLC7d7f8QuFTU5OyaSnGdCd0M//uBVBKSt5b9v9TWK6fT98ZjKMvmMOcZItHwLVJx7g==}
+    engines: {node: '>=14.*'}
+    hasBin: true
+    requiresBuild: true
+    optionalDependencies:
+      '@rometools/cli-darwin-arm64': 0.8.0-next.ff4153b
+      '@rometools/cli-darwin-x64': 0.8.0-next.ff4153b
+      '@rometools/cli-linux-arm64': 0.8.0-next.ff4153b
+      '@rometools/cli-linux-x64': 0.8.0-next.ff4153b
+      '@rometools/cli-win32-arm64': 0.8.0-next.ff4153b
+      '@rometools/cli-win32-x64': 0.8.0-next.ff4153b
     dev: true
 
   /run-con/1.2.11:

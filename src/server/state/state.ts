@@ -53,7 +53,7 @@ export class StubsyState {
 
   getOverrideBehaviour(
     endpointId: string,
-    overrideId: string
+    overrideId: string,
   ): OverrideBehaviour | null {
     return this._overrides.get(endpointId)?.get(overrideId) ?? null;
   }
@@ -65,7 +65,7 @@ export class StubsyState {
   addOverride(
     endpointId: string,
     overrideId: string,
-    overrideBehaviour: OverrideBehaviour
+    overrideBehaviour: OverrideBehaviour,
   ): void {
     const overridesForEndpoint = this._overrides.get(endpointId);
 
@@ -74,7 +74,7 @@ export class StubsyState {
     } else {
       this._overrides.set(
         endpointId,
-        new Map().set(overrideId, overrideBehaviour)
+        new Map().set(overrideId, overrideBehaviour),
       );
     }
   }

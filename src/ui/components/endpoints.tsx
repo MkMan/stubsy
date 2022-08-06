@@ -7,11 +7,13 @@ export const Endpoints: FC<{ serverConfig: ConfigResponseEntry[] }> = ({
   serverConfig,
 }) => (
   <>
-    {serverConfig.map((endpointConfig) => (
+  {serverConfig.map(
+    (endpointConfig) => (
       <Endpoint
         key={endpointConfig.endpointId}
         endpointConfig={endpointConfig}
       />
-    ))}
+    ),
+  )}
   </>
 );

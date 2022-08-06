@@ -33,13 +33,13 @@ describe(`Stubsy`, () => {
     vi.clearAllMocks();
     generateUiConfigResponseSpy = vi.spyOn(
       stubsyUtilities,
-      'generateUiConfigResponse'
+      'generateUiConfigResponse',
     );
     consoleLogSpy = vi.spyOn(console, 'log');
     assertSpy = vi.spyOn(stubsyUtilities, 'assert');
     generateEndpointCallbackSpy = vi.spyOn(
       stubsyUtilities,
-      'generateEndpointCallback'
+      'generateEndpointCallback',
     );
   });
 
@@ -66,7 +66,8 @@ describe(`Stubsy`, () => {
 
     it(`should initialise the portNumber instance variable`, () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      expect((stubsyInstance as any).portNumber).toEqual(portNumber);
+      expect((stubsyInstance as any).portNumber)
+        .toEqual(portNumber);
     });
 
     it(`should initialise the json middleware`, () => {
@@ -75,11 +76,11 @@ describe(`Stubsy`, () => {
 
     it(`should initialise the UI route`, () => {
       expect(mockExpressStatic).toHaveBeenCalledWith(
-        path.resolve(__dirname, './ui/')
+        path.resolve(__dirname, './ui/'),
       );
       expect(stubsyInstance.app.use).toHaveBeenCalledWith(
         '/Stubsy',
-        mockExpressStatic()
+        mockExpressStatic(),
       );
     });
 
@@ -91,28 +92,30 @@ describe(`Stubsy`, () => {
         },
       };
       vi.spyOn(stubsyInstance, 'activateOverride');
-      const postConfigCallback = (stubsyInstance.app.post as Mock).mock
-        .calls[0][1];
+      const postConfigCallback = (stubsyInstance.app.post as Mock).mock.calls[
+        0
+      ][1];
       postConfigCallback(requestMock, responseMock);
-      const getConfigCallback = (stubsyInstance.app.get as Mock).mock
-        .calls[0][1];
+      const getConfigCallback = (stubsyInstance.app.get as Mock).mock.calls[0][
+        1
+      ];
 
       postConfigCallback(requestMock, responseMock);
       getConfigCallback(requestMock, responseMock);
 
       expect(stubsyInstance.app.post).toHaveBeenCalledWith(
         '/Stubsy/Config',
-        expect.any(Function)
+        expect.any(Function),
       );
       expect(stubsyInstance.activateOverride).toHaveBeenCalledWith(
         requestMock.body.endpointId,
-        requestMock.body.overrideId
+        requestMock.body.overrideId,
       );
       expect(responseMock.send).toHaveBeenCalledWith({ status: 'OK' });
 
       expect(stubsyInstance.app.get).toHaveBeenCalledWith(
         '/Stubsy/Config',
-        expect.any(Function)
+        expect.any(Function),
       );
       expect(stubsyUtilities.generateUiConfigResponse).toHaveBeenCalled();
       expect(responseMock.send).toHaveBeenCalledWith(mockUiResponse);
@@ -129,14 +132,14 @@ describe(`Stubsy`, () => {
 
     it(`should log how to access the server to the user`, () => {
       expect(consoleLogSpy).toHaveBeenCalledWith(
-        `Stubsy is now listening on port ${portNumber}\nThe Stubsy UI can be accessed on http://localhost:${portNumber}/Stubsy`
+        `Stubsy is now listening on port ${portNumber}\nThe Stubsy UI can be accessed on http://localhost:${portNumber}/Stubsy`,
       );
     });
 
     it(`should start the server on the port number specified`, () => {
       expect(stubsyInstance.app.listen).toHaveBeenCalledWith(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (stubsyInstance as any).portNumber
+        (stubsyInstance as any).portNumber,
       );
     });
 
@@ -164,7 +167,7 @@ describe(`Stubsy`, () => {
 
     it(`should throw an error if the endpointId already exists`, () => {
       (StubsyState.getInstance().endpointExists as Mock).mockReturnValueOnce(
-        true
+        true,
       );
 
       expect(() => {
@@ -177,7 +180,7 @@ describe(`Stubsy`, () => {
 
       expect(StubsyState.getInstance().addEndpoint).toHaveBeenCalledWith(
         endpointId,
-        endpointBehaviour
+        endpointBehaviour,
       );
     });
 
@@ -189,7 +192,7 @@ describe(`Stubsy`, () => {
 
       expect(stubsyInstance.app[endpointBehaviour.type]).toHaveBeenCalledWith(
         endpointBehaviour.path,
-        endpointCallback
+        endpointCallback,
       );
     });
   });
@@ -202,14 +205,14 @@ describe(`Stubsy`, () => {
     it(`should throw an error if the specified endpoint doesn't exist`, () => {
       const endpointId = 'undefinedEndpoint';
       (StubsyState.getInstance().endpointExists as Mock).mockReturnValueOnce(
-        false
+        false,
       );
 
       expect(() => {
         stubsyInstance.registerOverride(
           endpointId,
           'does not matter',
-          undefined as unknown as OverrideBehaviour
+          undefined as unknown as OverrideBehaviour,
         );
       }).toThrow(`Endpoint with id${endpointId} has not been defined`);
     });
@@ -222,20 +225,20 @@ describe(`Stubsy`, () => {
         responseBody: {},
       };
       (StubsyState.getInstance().endpointExists as Mock).mockReturnValueOnce(
-        true
+        true,
       );
       (StubsyState.getInstance().overrideExists as Mock).mockReturnValueOnce(
-        true
+        true,
       );
 
       expect(() => {
         stubsyInstance.registerOverride(
           endpointId,
           overrideId,
-          overrideBehaviour
+          overrideBehaviour,
         );
       }).toThrow(
-        `An override with id ${overrideId} has already been set for endpoint ${endpointId}`
+        `An override with id ${overrideId} has already been set for endpoint ${endpointId}`,
       );
     });
 
@@ -247,22 +250,22 @@ describe(`Stubsy`, () => {
         responseBody: {},
       };
       (StubsyState.getInstance().endpointExists as Mock).mockReturnValueOnce(
-        true
+        true,
       );
       (StubsyState.getInstance().overrideExists as Mock).mockReturnValueOnce(
-        false
+        false,
       );
 
       stubsyInstance.registerOverride(
         endpointId,
         overrideId,
-        overrideBehaviour
+        overrideBehaviour,
       );
 
       expect(StubsyState.getInstance().addOverride).toHaveBeenCalledWith(
         endpointId,
         overrideId,
-        overrideBehaviour
+        overrideBehaviour,
       );
     });
   });
@@ -280,7 +283,7 @@ describe(`Stubsy`, () => {
 
       expect(StubsyState.getInstance().setActiveOverride).toHaveBeenCalledWith(
         endpointId,
-        overrideId
+        overrideId,
       );
     });
 
@@ -289,7 +292,7 @@ describe(`Stubsy`, () => {
 
       expect(StubsyState.getInstance().setActiveOverride).toHaveBeenCalledWith(
         endpointId,
-        'none'
+        'none',
       );
     });
   });

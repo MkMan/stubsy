@@ -24,7 +24,7 @@ export const Overrides: FC<OverrideProps> = ({
   onOverrideChange,
 }) => {
   const [value, setValue] = React.useState(
-    overrides.find(({ isActive }) => isActive)?.overrideId ?? 'none'
+    overrides.find(({ isActive }) => isActive)?.overrideId ?? 'none',
   );
 
   const handleOverrideChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -49,15 +49,17 @@ export const Overrides: FC<OverrideProps> = ({
               label="Default"
               data-testid="default"
             />
-            {overrides.map(({ overrideId }) => (
-              <FormControlLabel
-                key={overrideId}
-                value={overrideId}
-                control={<Radio />}
-                data-testid={overrideId}
-                label={overrideId}
-              />
-            ))}
+            {overrides.map(
+              ({ overrideId }) => (
+                <FormControlLabel
+                  key={overrideId}
+                  value={overrideId}
+                  control={<Radio />}
+                  data-testid={overrideId}
+                  label={overrideId}
+                />
+              ),
+            )}
           </RadioGroup>
         </FormControl>
       </CardContent>

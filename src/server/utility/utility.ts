@@ -37,7 +37,7 @@ export const generateUiConfigResponse = (): ConfigResponseEntry[] => {
 };
 
 export const generateEndpointCallback = (
-  endpoint: Endpoint
+  endpoint: Endpoint,
 ): RequestHandler => {
   const state = StubsyState.getInstance();
   const {
