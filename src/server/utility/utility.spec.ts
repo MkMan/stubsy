@@ -87,23 +87,28 @@ describe(`Stubsy Utility functions`, () => {
         responseBody: ['24', 'Attack on Titan'],
       };
 
-      const endpoints: StubsyEndpoints = new Map()
-        .set(endpoint1Id, endpoint1Behaviour)
-        .set(endpoint2Id, endpoint2Behaviour)
-        .set(endpoint3Id, endpoint3Behaviour);
+      const endpoints: StubsyEndpoints = new Map().set(
+        endpoint1Id,
+        endpoint1Behaviour,
+      ).set(endpoint2Id, endpoint2Behaviour).set(
+        endpoint3Id,
+        endpoint3Behaviour,
+      );
 
       const overrides: StubsyOverrides = new Map()
         .set(
           endpoint1Id,
-          new Map()
-            .set(override1Id1, override1Behaviour1)
-            .set(override1Id2, override1Behaviour2)
+          new Map().set(override1Id1, override1Behaviour1).set(
+            override1Id2,
+            override1Behaviour2,
+          ),
         )
         .set(endpoint3Id, new Map().set(override3Id1, override3Behaviour1));
 
-      const activeOverrides: StubsyActiveOverrides = new Map()
-        .set(endpoint1Id, override1Id1)
-        .set(endpoint3Id, override3Behaviour1);
+      const activeOverrides: StubsyActiveOverrides = new Map().set(
+        endpoint1Id,
+        override1Id1,
+      ).set(endpoint3Id, override3Behaviour1);
 
       (StubsyState.getInstance as vi.Mock).mockReturnValueOnce({
         endpoints,
@@ -123,8 +128,7 @@ describe(`Stubsy Utility functions`, () => {
     const endpointId = 'books';
     const status: EndpointBehaviour['status'] = 200;
     const responseBody: EndpointBehaviour['responseBody'] = [
-      'book 1',
-      'book 2',
+      'book 1', 'book 2',
     ];
     const endpoint: Endpoint = { endpointId, responseBody, status } as Endpoint;
 
@@ -198,10 +202,10 @@ describe(`Stubsy Utility functions`, () => {
       vi.advanceTimersByTime(0);
 
       expect(responseMock.status).toHaveBeenCalledWith(
-        overrideBehaviour.status
+        overrideBehaviour.status,
       );
       expect(responseMock.send).toHaveBeenCalledWith(
-        overrideBehaviour.responseBody
+        overrideBehaviour.responseBody,
       );
     });
 
@@ -231,10 +235,10 @@ describe(`Stubsy Utility functions`, () => {
       vi.advanceTimersByTime(1000);
 
       expect(responseMock.status).toHaveBeenCalledWith(
-        overrideBehaviour.status
+        overrideBehaviour.status,
       );
       expect(responseMock.send).toHaveBeenCalledWith(
-        overrideBehaviour.responseBody
+        overrideBehaviour.responseBody,
       );
     });
   });

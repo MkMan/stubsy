@@ -32,4 +32,5 @@ const App: FC = () => {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-createRoot(document.getElementById('app-root')!).render(<App />);
+createRoot(document.getElementById('app-root')!)
+  .render(<App />);

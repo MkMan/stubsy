@@ -8,17 +8,21 @@ export type EndpointBehaviour = {
   type: 'get' | 'post' | 'put' | 'delete' | 'patch';
   delay?: number;
 };
-export type Endpoint = {
-  endpointId: EndpointId;
-} & EndpointBehaviour;
+export type Endpoint =
+  & {
+    endpointId: EndpointId;
+  }
+  & EndpointBehaviour;
 
 export type OverrideBehaviour = Pick<
   EndpointBehaviour,
   'status' | 'responseBody' | 'delay'
 >;
-export type Override = {
-  overrideId: OverrideId;
-} & OverrideBehaviour;
+export type Override =
+  & {
+    overrideId: OverrideId;
+  }
+  & OverrideBehaviour;
 
 export type ConfigPayload = {
   endpointId: EndpointId;

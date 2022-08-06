@@ -1,16 +1,15 @@
 import { EndpointBehaviour, OverrideBehaviour } from '../types';
 import { StubsyState } from './state';
 
-type StubsStateWithoutTS = Omit<
-  StubsyState,
-  '_endpoints' | '_overrides' | '_activeOverrides'
-> & {
-  /* eslint-disable @typescript-eslint/no-explicit-any */
-  _activeOverrides: Map<string, any>;
-  _endpoints: Map<string, any>;
-  _overrides: Map<string, any>;
-  /* eslint-enable @typescript-eslint/no-explicit-any */
-};
+type StubsStateWithoutTS =
+  & Omit<StubsyState, '_endpoints' | '_overrides' | '_activeOverrides'>
+  & {
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    _activeOverrides: Map<string, any>;
+    _endpoints: Map<string, any>;
+    _overrides: Map<string, any>;
+    /* eslint-enable @typescript-eslint/no-explicit-any */
+  };
 
 describe(`StubsyState`, () => {
   let state: StubsStateWithoutTS;
@@ -70,7 +69,7 @@ describe(`StubsyState`, () => {
     it(`should return true if override exists`, () => {
       state._overrides.set(
         'endpointId',
-        new Map().set('overrideId', 'not needed')
+        new Map().set('overrideId', 'not needed'),
       );
 
       expect(state.overrideExists('endpointId', 'overrideId')).toBe(true);
@@ -79,11 +78,11 @@ describe(`StubsyState`, () => {
     it(`should return false if the override doesn't exist`, () => {
       state._overrides.set(
         'endpointId',
-        new Map().set('overrideId', 'not needed')
+        new Map().set('overrideId', 'not needed'),
       );
 
       expect(state.overrideExists('endpointId', 'some other override id')).toBe(
-        false
+        false,
       );
     });
 
@@ -91,7 +90,7 @@ describe(`StubsyState`, () => {
       state._overrides.set('endpointId', 'not needed');
 
       expect(state.overrideExists('some bad endpoint id', 'overrideId')).toBe(
-        false
+        false,
       );
     });
   });
@@ -120,7 +119,7 @@ describe(`StubsyState`, () => {
     const overrideBehaviour = { status: 200 };
     const overrides = new Map().set(
       endpointId,
-      new Map().set(overrideId, overrideBehaviour)
+      new Map().set(overrideId, overrideBehaviour),
     );
 
     beforeEach(() => {
@@ -129,19 +128,19 @@ describe(`StubsyState`, () => {
 
     it(`should return the overrideBehaviour if it's found`, () => {
       expect(state.getOverrideBehaviour(endpointId, overrideId)).toBe(
-        overrideBehaviour
+        overrideBehaviour,
       );
     });
 
     it(`should return null if there are no overrides for the endpointId`, () => {
       expect(
-        state.getOverrideBehaviour('fakeEndpointId', overrideId)
+        state.getOverrideBehaviour('fakeEndpointId', overrideId),
       ).toBeNull();
     });
 
     it(`should return null if the overrideId has no registered behaviour`, () => {
       expect(
-        state.getOverrideBehaviour(endpointId, 'invalidOverrideId')
+        state.getOverrideBehaviour(endpointId, 'invalidOverrideId'),
       ).toBeNull();
     });
   });
@@ -165,18 +164,18 @@ describe(`StubsyState`, () => {
     it(`should add the override to existing overrides for the endpoint`, () => {
       state._overrides = new Map().set(
         endpointId,
-        new Map().set('someOtherOverride', {})
+        new Map().set('someOtherOverride', {}),
       );
 
       state.addOverride(
         endpointId,
         overrideId,
-        overrideBehaviour as OverrideBehaviour
+        overrideBehaviour as OverrideBehaviour,
       );
 
       expect(state._overrides.get(endpointId).size).toBe(2);
       expect(state._overrides.get(endpointId).get(overrideId)).toBe(
-        overrideBehaviour
+        overrideBehaviour,
       );
     });
 
@@ -186,12 +185,12 @@ describe(`StubsyState`, () => {
       state.addOverride(
         endpointId,
         overrideId,
-        overrideBehaviour as OverrideBehaviour
+        overrideBehaviour as OverrideBehaviour,
       );
 
       expect(state._overrides.get(endpointId).size).toBe(1);
       expect(state._overrides.get(endpointId).get(overrideId)).toBe(
-        overrideBehaviour
+        overrideBehaviour,
       );
     });
   });
@@ -221,7 +220,7 @@ describe(`StubsyState`, () => {
 
     it(`should return null if the endpoint has no active override`, () => {
       expect(
-        state.getActiveOverrideId('endpoint with no active overrides')
+        state.getActiveOverrideId('endpoint with no active overrides'),
       ).toBeNull();
     });
   });
@@ -235,22 +234,23 @@ describe(`StubsyState`, () => {
     beforeEach(() => {
       state._overrides = new Map().set(
         endpointId,
-        new Map().set(overrideId, overrideBehaviour)
+        new Map().set(overrideId, overrideBehaviour),
       );
-      state._activeOverrides = new Map()
-        .set(endpointId, overrideId)
-        .set(endpointId2, overrideId);
+      state._activeOverrides = new Map().set(endpointId, overrideId).set(
+        endpointId2,
+        overrideId,
+      );
     });
 
     it(`should return the active override behaviour if there is one`, () => {
       expect(state.getActiveOverrideBehaviour(endpointId)).toBe(
-        overrideBehaviour
+        overrideBehaviour,
       );
     });
 
     it(`should return null when the endpoint has no active override`, () => {
       expect(
-        state.getActiveOverrideBehaviour('endpointWithoutActiveOverrides')
+        state.getActiveOverrideBehaviour('endpointWithoutActiveOverrides'),
       ).toBeNull();
     });
 
