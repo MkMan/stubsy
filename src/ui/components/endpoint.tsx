@@ -40,9 +40,9 @@ export const Endpoint: FC<{ endpointConfig: EndpointConfig }> = ({
         action={
           hasOverrides ? (
             <IconButton
-              onClick={handleExpandClick}
               aria-expanded={isExpanded}
               aria-label="show more"
+              onClick={handleExpandClick}
             >
               <ExpandMoreIcon />
             </IconButton>
@@ -52,10 +52,10 @@ export const Endpoint: FC<{ endpointConfig: EndpointConfig }> = ({
       />
       {hasOverrides && (
         <Overrides
-          onOverrideChange={onOverrideChange}
-          overrides={overrides}
           endpointId={endpointId}
           isExpanded={isExpanded}
+          onOverrideChange={onOverrideChange}
+          overrides={overrides}
         />
       )}
     </Card>

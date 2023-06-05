@@ -7,7 +7,7 @@ import { ConfigResponseEntry } from '../server/types';
 import { Endpoints } from './components/endpoints';
 
 const Logo: FC = () => (
-  <Typography variant="h1" component="h1" align="center" gutterBottom>
+  <Typography align="center" component="h1" gutterBottom variant="h1">
     Stubsy
   </Typography>
 );
