@@ -1,3 +1,10 @@
+## [1.3.3](https://github.com/MkMan/stubsy/compare/v1.3.2...v1.3.3) (2024-03-27)
+
+
+### Bug Fixes
+
+* package.json to reduce vulnerabilities ([66f46c8](https://github.com/MkMan/stubsy/commit/66f46c85868f441ae4c2568666e069ce617faac8))
+
 ## [1.3.2](https://github.com/MkMan/stubsy/compare/v1.3.1...v1.3.2) (2023-03-22)
 
 
